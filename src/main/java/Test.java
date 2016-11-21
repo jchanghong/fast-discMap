@@ -1,5 +1,5 @@
 import map.MMap;
-import map.MMapIpml;
+import map.MyMapImpl;
 import map.test.TestObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -23,7 +23,7 @@ public class Test {
     private static void testmymap() {
         long s = System.currentTimeMillis();
         TestObject object = new TestObject("金香");
-        MMap mMap = new MMapIpml("changhong.txt");
+        MMap mMap = new MyMapImpl("changhong.txt");
 //        mMap.put("jinxiang", object);
         System.out.println("values is:" + mMap.get("jinxiang") + "    我的 time is:" + (System.currentTimeMillis() - s));
     }

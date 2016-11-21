@@ -7,13 +7,15 @@ import java.util.Arrays;
 
 /**
  * Created by 长宏 on 2016/11/21 0021.
+ * 磁盘map的实现，重在简单，速度。
  */
-public class MMapIpml implements MMap {
-     int NUM = 997;
-    int size = 1024 * 10;
+public class MyMapImpl implements MMap {
+    int NUM = 997;//选择好的素数
+    int size = 1024 * 10;//一个hashcode的值大小，如果有冲突。
+    // 这个大小用链表类型的方式储存。这样是为了简单速度
     private RandomAccessFile file;
     private FileChannel fileChannel;
-    public MMapIpml(String filename) {
+    public MyMapImpl(String filename) {
         boolean neeinit = true;
         File file1 = new File(filename);
         if (file1.exists()) {
