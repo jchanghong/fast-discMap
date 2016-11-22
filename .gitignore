@@ -18,3 +18,5 @@ hs_err_pid*
 src/main/resources/
 src/test/
 target/
+/file.db
+/changhong.txt
