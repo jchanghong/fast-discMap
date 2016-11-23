@@ -32,7 +32,7 @@ public class Test {
         for (int i = 0; i < 2000; i++) {
             ob.id = i;
             ob.name = "changhong" + i;
-//            map.put("hello" + i, ob);
+            map.put("hello" + i, ob);
             TestObject o = (TestObject) map.get("hello" + i);
             Assert.assertTrue(o.name.equals("changhong" + i));
             Assert.assertTrue(o.id == i);
