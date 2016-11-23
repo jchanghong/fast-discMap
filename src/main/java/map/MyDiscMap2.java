@@ -13,7 +13,7 @@ import java.util.*;
  * 磁盘map实现。方法2
  */
 public class MyDiscMap2 implements Map<String, Object> {
-    private static final int NUM_DATA = 997;
+    private static final int NUM_DATA = 19;
     private static final int NUM_HEAD = 3;
     private final int NUM = NUM_DATA + NUM_HEAD;
     private static final int SIZE = 1024 * 10;
@@ -248,7 +248,7 @@ public class MyDiscMap2 implements Map<String, Object> {
                 buffer = ByteBuffer.allocate(size);
                 while (shengxia > 0 && fileindex < filesize) {
                     if (fileindex == 0) {
-                        shengxia -= NUM_HEAD * SIZE - 4;
+                        shengxia -=SIZE - 4;
                         buffer.put(getbytes(fileindex++, hashindex, SIZE - 4));
                     }
                     if (shengxia >= SIZE) {
@@ -257,7 +257,6 @@ public class MyDiscMap2 implements Map<String, Object> {
                     } else {
                         buffer.put(getbytes(fileindex++, hashindex, shengxia));
                         shengxia = 0;
-
                     }
                 }
                 byte[] bytes = buffer.array();
@@ -333,6 +332,9 @@ public class MyDiscMap2 implements Map<String, Object> {
                         shengxia -= SIZE;
                         buffer.put(getbytes(fileindex++, hashindex, SIZE));
                     } else {
+                        if (shengxia < 1) {
+                            break;
+                        }
                         buffer.put(getbytes(fileindex++, hashindex, shengxia));
                         shengxia = 0;
 
