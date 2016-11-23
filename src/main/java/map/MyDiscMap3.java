@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
@@ -19,17 +19,17 @@ import java.util.concurrent.Executors;
 public class MyDiscMap3 implements Map<String, Object> ,Log{
     private static final int INITSIZE = 1024 * 1024 * 1;
     private FileChannel fileChannel;
+    private int filesize = 0;
     private MappedByteBuffer buffer;//性能原因。保存
   volatile private   Map<String, Object> map;
-    Executor executor = Executors.newSingleThreadExecutor();
+    ExecutorService executor = Executors.newSingleThreadExecutor();
     public MyDiscMap3(String file) {
         try {
             fileChannel = new RandomAccessFile(file,"rw").getChannel();
-            buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, INITSIZE);
+            filesize = (int) fileChannel.size();
+            int buffnumber = filesize >= INITSIZE ? filesize : INITSIZE;
+            buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, buffnumber);
             int size = buffer.getInt();
-            if (size > INITSIZE - 4) {
-                buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, size);
-            }
             if (size == 0) {
                 map = new HashMap<>();
             }
@@ -147,9 +147,9 @@ public class MyDiscMap3 implements Map<String, Object> ,Log{
         @Override
         public void run() {
             byte[] bytes = getEsirabytes(map);
-            if (bytes.length > INITSIZE - 4) {
+            if (bytes.length > filesize - 4) {
                 try {
-                    buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, bytes.length);
+                    buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, bytes.length+8);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -160,5 +160,22 @@ public class MyDiscMap3 implements Map<String, Object> ,Log{
         }
 
     };
-
+    public void close() {
+        byte[] bytes = getEsirabytes(map);
+        if (bytes.length > filesize - 4) {
+            try {
+                buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, bytes.length+8);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        buffer.position(0);
+        buffer.putInt(bytes.length);
+        buffer.put(bytes);
+//        try {
+//            executor.awaitTermination(3000, TimeUnit.MICROSECONDS);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+    }
 }

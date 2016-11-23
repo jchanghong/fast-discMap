@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class Test {
     static Map<String, Object> map;
-    static Map<String, Object> map3;
+    static MyDiscMap3 map3;
   static   DB db = DBMaker.fileDB("file.db").make();
   static   ConcurrentMap mapdb = db.hashMap("map1").createOrOpen();
 
@@ -41,16 +41,16 @@ public class Test {
     }
     @org.junit.Test
     public void testmyMap3() {
-        TestObject ob = new TestObject();
         for (int i = 0; i < 2000; i++) {
+            TestObject ob = new TestObject();
             ob.id = i;
             ob.name = "changhong" + i;
             map3.put("hello" + i, ob);
             TestObject o = (TestObject) map3.get("hello" + i);
             Assert.assertTrue(o.name.equals("changhong" + i));
             Assert.assertTrue(o.id == i);
-
         }
+        map3.close();
     }
     @org.junit.Test
     public void testMapDB() {
