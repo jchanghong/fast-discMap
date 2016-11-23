@@ -172,10 +172,6 @@ public class MyDiscMap3 implements Map<String, Object> ,Log{
         buffer.position(0);
         buffer.putInt(bytes.length);
         buffer.put(bytes);
-//        try {
-//            executor.awaitTermination(3000, TimeUnit.MICROSECONDS);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        executor.shutdownNow();
     }
 }

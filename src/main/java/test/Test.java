@@ -23,7 +23,6 @@ public class Test {
     public static void init() {
         map = new MyDiscMap2("file.map");
         map3 = new MyDiscMap3("file3.map");
-
     }
 
     @org.junit.Test
