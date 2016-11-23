@@ -13,7 +13,7 @@ import java.util.*;
  * 磁盘map实现。方法2
  */
 public class MyDiscMap2 implements Map<String, Object> {
-    private static final int NUM_DATA = 19;
+    private static final int NUM_DATA = 997;
     private static final int NUM_HEAD = 3;
     private final int NUM = NUM_DATA + NUM_HEAD;
     private static final int SIZE = 1024 * 10;
