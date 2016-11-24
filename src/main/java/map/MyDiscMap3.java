@@ -146,21 +146,26 @@ public class MyDiscMap3 implements Map<String, Object> ,Log{
     private Runnable synrunnable = new Runnable() {
         @Override
         public void run() {
-            byte[] bytes = getEsirabytes(map);
-            if (bytes.length > filesize - 4) {
-                try {
-                    buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, bytes.length+8);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            try {
+                byte[] bytes = getEsirabytes(map);
+                if (bytes.length > filesize - 4) {
+                    try {
+                        buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, bytes.length+8);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
+                buffer.position(0);
+                buffer.putInt(bytes.length);
+                buffer.put(bytes);
+            } catch (Exception e) {
+                //没有必要
             }
-            buffer.position(0);
-            buffer.putInt(bytes.length);
-            buffer.put(bytes);
         }
 
     };
     public void close() {
+        executor.shutdownNow();
         byte[] bytes = getEsirabytes(map);
         if (bytes.length > filesize - 4) {
             try {
@@ -172,6 +177,10 @@ public class MyDiscMap3 implements Map<String, Object> ,Log{
         buffer.position(0);
         buffer.putInt(bytes.length);
         buffer.put(bytes);
-        executor.shutdownNow();
+        try {
+            fileChannel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -27,8 +27,8 @@ public class Test {
 
     @org.junit.Test
     public void testMymap2() {
-        TestObject ob = new TestObject();
         for (int i = 0; i < 2000; i++) {
+            TestObject ob = new TestObject();
             ob.id = i;
             ob.name = "changhong" + i;
             map.put("hello" + i, ob);
@@ -53,8 +53,8 @@ public class Test {
     }
     @org.junit.Test
     public void testMapDB() {
-        TestObject ob = new TestObject();
         for (int i = 0; i < 2000; i++) {
+            TestObject ob = new TestObject();
             ob.id = i;
             ob.name = "changhong" + i;
             mapdb.put("hello" + i, ob);
