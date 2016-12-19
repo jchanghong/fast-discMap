@@ -1,4 +1,4 @@
-package map.map2;
+package map.htree;
 
 import java.util.ArrayList;
 import java.util.Comparator;

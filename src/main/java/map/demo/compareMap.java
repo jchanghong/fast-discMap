@@ -1,6 +1,6 @@
-package map;
+package map.demo;
 
-import map.map2.MHtree;
+import map.htree.MHtree;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

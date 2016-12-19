@@ -1,5 +1,7 @@
-package map;
+package map.demo;
 
+
+import map.htree.Log;
 
 import java.io.*;
 import java.nio.MappedByteBuffer;
@@ -15,7 +17,7 @@ import java.util.concurrent.Executors;
  * Created by 长宏 on 2016/11/23 0023.
  * 磁盘map实现。方法3
  */
-public class MyDiscMap3 implements Map<String, Object> ,Log{
+public class MyDiscMap3 implements Map<String, Object> ,Log {
     private static final int INITSIZE = 1024 * 1024 * 1;
     private FileChannel fileChannel;
     private int filesize = 0;

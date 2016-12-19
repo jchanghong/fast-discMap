@@ -1,7 +1,6 @@
-package map.map2;
+package map.htree;
 
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -9,11 +8,12 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("Duplicates")
 public class MHtree implements Map<String,Object>{
-    private MHtreeNode root;
+     private   MHtreeNode root;
     public static List<MHtreeNode> nodes = new ArrayList<>(1000);
 
     public MHtree() {
         root = new MHtreeNode(0, null, null);
+        nodes.clear();
         nodes.add(root);
         root.childs = new MHtreeNode[root.code];
     }
