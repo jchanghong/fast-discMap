@@ -1,8 +1,8 @@
 package map.map2;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Created by jiang on 2016/12/19 0019.
@@ -10,30 +10,33 @@ import java.util.Set;
 @SuppressWarnings("Duplicates")
 public class MHtree implements Map<String,Object>{
     private MHtreeNode root;
+    public static List<MHtreeNode> nodes = new ArrayList<>(1000);
 
     public MHtree() {
         root = new MHtreeNode(0, null, null);
+        nodes.add(root);
         root.childs = new MHtreeNode[root.code];
     }
 
     @Override
     public int size() {
-        return 0;
+        return (int) nodes.stream().filter(a -> a.hasV == true).count();
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size()==0;
     }
 
     @Override
-    public boolean containsKey(Object key) {
-        return false;
+    public boolean containsKey(Object key)
+    {
+        return get(key) != null;
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return false;
+      return   nodes.stream().filter(a -> a.hasV && a.values.equals(value)).count()>0;
     }
 
     @Override
@@ -65,6 +68,7 @@ public class MHtree implements Map<String,Object>{
         MHtreeNode node = root.childs[code0];
         if (node == null) {
             root.childs[code0] = new MHtreeNode(1, key, value);
+            MHtree.nodes.add(root.childs[code0]);
             return null;
         }
         else {
@@ -110,27 +114,48 @@ public class MHtree implements Map<String,Object>{
 
     @Override
     public void putAll(Map<? extends String, ?> m) {
-
+        m.entrySet().forEach(a -> put(a.getKey(), a.getValue()));
     }
 
     @Override
     public void clear() {
-
+        for (MHtreeNode node : nodes) {
+            node.hasV = false;
+        }
     }
 
     @Override
     public Set<String> keySet() {
-        return null;
+        Set<String> collect = nodes.stream().filter(a -> a.hasV).map(a -> a.key).collect(Collectors.toSet());
+        return collect;
     }
 
     @Override
     public Collection<Object> values() {
-        return null;
+        Set<Object> collect = nodes.stream().filter(a -> a.hasV).map(a -> a.values).collect(Collectors.toSet());
+        return collect;
     }
 
     @Override
     public Set<Entry<String, Object>> entrySet() {
-        return null;
+        Set collect = nodes.stream().filter(a -> a.hasV).map(a ->{
+            return new Entry() {
+                @Override
+                public Object getKey() {
+                    return a.key;
+                }
+                @Override
+                public Object getValue() {
+                    return a.values;
+                }
+
+                @Override
+                public Object setValue(Object value) {
+                    return null;
+                }
+            };
+        }).collect(Collectors.toSet());
+        return collect;
     }
 
     @Override

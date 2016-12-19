@@ -12,9 +12,6 @@ public class MHtreeNode implements Comparable<MHtreeNode> {
     public String key;
     public Object values;
 
-    public MHtreeNode() {
-        this(0, null, null);
-    }
 
     public MHtreeNode(int high, String key, Object values) {
         this.high = high;
@@ -38,10 +35,12 @@ public class MHtreeNode implements Comparable<MHtreeNode> {
         if (childs == null) {
             childs = new MHtreeNode[code];
             childs[mycode] = new MHtreeNode(high + 1, key, values);
+            MHtree.nodes.add(childs[mycode]);
             return values;
         }
         if (childs[mycode] == null) {
             childs[mycode] = new MHtreeNode(high + 1, key, values);
+            MHtree.nodes.add(childs[mycode]);
             return values;
         }
         if (childs[mycode].hasV && childs[mycode].key.equals(key)) {
