@@ -1,6 +1,10 @@
 package map.db;
 
+import map.htree.MHtreeNode;
+import sun.security.util.BitArray;
+
 import java.io.*;
+import java.util.BitSet;
 
 /**
  * Created by jiang on 2016/12/19 0019.
@@ -38,16 +42,28 @@ public class ObjectSeriaer {
 
 
     public static void main(String[] args) {
-        byte[] bbb = getbytes("hello");
-        getbytes("ddddddddddddddddddddddddd");
-        System.out.println(geto(bbb) + "");
-        System.out.println(getbytes("hello").length);
-        System.out.println(getbytes("hello").length);
-        byte[] bb = getbytes("hello");
-        String b = geto(bb);
-        b = geto(bb);
-        System.out.println(b);
 
+        byte[] bytes = new byte[100000];
+        byte[] bb = ObjectSeriaer.getbytes(bytes);
+        System.out.println(bb.length);
+        byte[] a = ObjectSeriaer.geto(bb);
+        System.out.println(a.length);
+        BitSet bitArray = new BitSet(Pagesize.MAXPAGENUMBER);
+        bitArray.set(1,true);
+        bitArray.set(2,true);
+        bitArray.set(9,true);
+        System.out.println(bitArray.toString());
+        System.out.println(ObjectSeriaer.getbytes(bitArray).length/1024l);
+        System.out.println(Pagesize.MAXPAGENUMBER*1024*4l/1024/1024/1024);
+        testtrenode();
+    }
+
+    private static void testtrenode() {
+        MHtreeNode mHtreeNode = new MHtreeNode(0, null, null);
+//        mHtreeNode.childs = new MHtreeNode[mHtreeNode.code];
+        System.out.println(ObjectSeriaer.getbytes(mHtreeNode).length);
+        mHtreeNode = ObjectSeriaer.geto(ObjectSeriaer.getbytes(mHtreeNode));
+        System.out.println(mHtreeNode.code);
     }
 
 }

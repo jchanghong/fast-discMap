@@ -1,5 +1,7 @@
 package map.db;
 
+import sun.security.util.BitArray;
+
 import java.util.*;
 
 /**
@@ -11,12 +13,14 @@ public class Pagemanager {
     public static void main(String[] args) {
         for (int i = 0; i < 7; i++) {
             ArrayList linkedList = new ArrayList();
-            for (int j = 0; j < 1390; j++) {
+            for (int j = 0; j < 139; j++) {
                 linkedList.add(i + "" + j);
             }
             map.put(i, linkedList);
         }
         System.out.println(ObjectSeriaer.getbytes(map).length);
+         long x= (1024 * 1024 * 1024 *4l)>>>12;
+        System.out.println(x);
     }
 
 }

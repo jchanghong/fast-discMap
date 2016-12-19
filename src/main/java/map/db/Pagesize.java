@@ -12,4 +12,5 @@ public interface Pagesize {
     int M5 = M4 *2;
     int M6 = M5 *2;
     int M7 = M6 *2;
+    int MAXPAGENUMBER = 1048576;
 }

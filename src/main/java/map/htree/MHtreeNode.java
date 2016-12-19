@@ -1,17 +1,49 @@
 package map.htree;
 
+import java.io.*;
+
 /**
  * Created by jiang on 2016/12/19 0019.
  */
-public class MHtreeNode implements Comparable<MHtreeNode> {
+public class MHtreeNode implements Comparable<MHtreeNode> ,Externalizable{
 
-    final public int high;//root si 0
-    final public int code;
+     public int high;//root si 0
+     public int code;
     public MHtreeNode[] childs;
     public boolean hasV;
     public String key;
     public Object values;
 
+    public MHtreeNode() {
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.write(high);
+        out.writeObject(childs);
+        out.writeBoolean(hasV);
+        out.writeObject(key);
+        out.writeObject(values);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+
+      this.high = in.read();
+        this.code = MHashCodes.codes[high];
+        childs = (MHtreeNode[]) in.readObject();
+        hasV = in.readBoolean();
+        try {
+            key = (String) in.readObject();
+        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+            key = null;
+        } catch (IOException e) {
+//            e.printStackTrace();
+            key = null;
+        }
+        values = in.readObject();
+    }
 
     public MHtreeNode(int high, String key, Object values) {
         this.high = high;
