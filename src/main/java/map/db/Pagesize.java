@@ -13,4 +13,6 @@ public interface Pagesize {
     int M6 = M5 *2;
     int M7 = M6 *2;
     int MAXPAGENUMBER = 1048576;
+    short pagehead_tree = 1;
+    short pagehead_node = 2;
 }

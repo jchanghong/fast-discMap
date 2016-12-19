@@ -19,6 +19,24 @@ import java.util.List;
 class MStorage {
     public static BitSet bitSet;
 
+    public MStorage(String fileName) throws IOException {
+        this.fileName = fileName;
+        this.transactionsDisabled = true;
+        this.readonly = false;
+        this.lockingDisabled = false;
+        //make sure first file can be opened
+        //lock it
+        try {
+            if (!lockingDisabled)
+                getChannel(0).lock();
+        } catch (IOException e) {
+            throw new IOException("Could not lock DB file: " + fileName, e);
+        } catch (OverlappingFileLockException e) {
+            throw new IOException("Could not lock DB file: " + fileName, e);
+        }
+
+    }
+
     /**
      * The entry point of application.
      *
