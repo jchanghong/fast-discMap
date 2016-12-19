@@ -1,6 +1,5 @@
 package map;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.MappedByteBuffer;
@@ -111,7 +110,7 @@ public class MyDiscMap3 implements Map<String, Object> ,Log{
     }
 
     @Override
-    public void putAll(@NotNull Map<? extends String, ?> m) {
+    public void putAll(Map<? extends String, ?> m) {
 
         map.putAll(m);
         executor.execute(synrunnable);
@@ -125,19 +124,16 @@ public class MyDiscMap3 implements Map<String, Object> ,Log{
 
     }
 
-    @NotNull
     @Override
     public Set<String> keySet() {
         return map.keySet();
     }
 
-    @NotNull
     @Override
     public Collection<Object> values() {
         return map.values();
     }
 
-    @NotNull
     @Override
     public Set<Entry<String, Object>> entrySet() {
         return map.entrySet();

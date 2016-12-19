@@ -1,7 +1,5 @@
 package map;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -563,7 +561,7 @@ public class MyDiscMap2 implements Map<String, Object> {
      *                                       the specified map prevents it from being stored in this map
      */
     @Override
-    public void putAll(@NotNull Map<? extends String, ?> m) {
+    public void putAll( Map<? extends String, ?> m) {
         for (Map.Entry s : m.entrySet()) {
             put((String) s.getKey(), s.getValue());
         }
@@ -597,7 +595,6 @@ public class MyDiscMap2 implements Map<String, Object> {
      *
      * @return a set view of the keys contained in this map
      */
-    @NotNull
     @Override
     public Set<String> keySet() {
         if (keyset == null) {
@@ -622,7 +619,6 @@ public class MyDiscMap2 implements Map<String, Object> {
      *
      * @return a collection view of the values contained in this map
      */
-    @NotNull
     @Override
     public Collection<Object> values() {
         List l = new ArrayList();
@@ -648,7 +644,6 @@ public class MyDiscMap2 implements Map<String, Object> {
      *
      * @return a set view of the mappings contained in this map
      */
-    @NotNull
     @Override
     public Set<Map.Entry<String, Object>> entrySet() {
         Set<Map.Entry<String, Object>> set = new HashSet<>();
