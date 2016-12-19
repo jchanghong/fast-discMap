@@ -2,52 +2,106 @@ package map.db;
 
 import sun.misc.Cleaner;
 
+import javax.xml.ws.spi.http.HttpHandler;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 
+/**
+ * The type M storage.
+ */
 class MStorage {
+    public static BitSet bitSet;
+
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws IOException the io exception
+     */
     public static void main(String[] args) throws IOException {
         MStorage storage = new MStorage("d", false, false, false);
         storage.transactionsDisabled = true;
-        ByteBuffer byteBuffer = storage.read(1);
-        System.out.println(byteBuffer.limit());
-        storage.write(1, byteBuffer);
+//132/4
+        for (int i = 0; i < 33; i++) {
+            bitSet.set(i + 1, true);
+        }
+        storage.updatehead();
+
+//        ByteBuffer byteBuffer = storage.read(1);
+//        System.out.println(byteBuffer.limit());
+//        storage.write(1, byteBuffer);
 
     }
 
+    public void updatehead() {
+        headbuff.position(0);
+        headbuff.put(ObjectSeriaer.getbytes(bitSet));
+    }
+
+    /**
+     * The Transaction log file extension.
+     */
     static final String transaction_log_file_extension = ".t";
+    /**
+     * The Page size shift.
+     */
     static final int PAGE_SIZE_SHIFT = 12;
+    /**
+     * The Page size.
+     */
     static final int PAGE_SIZE = 1 << PAGE_SIZE_SHIFT;
+    /**
+     * The Clean data.
+     */
     static final byte[] CLEAN_DATA = new byte[MStorage.PAGE_SIZE];
     /**
      * use 'val & OFFSET_MASK' to quickly get offset within the page;
      */
     static final long OFFSET_MASK = 0xFFFFFFFFFFFFFFFFL >>> (64 - MStorage.PAGE_SIZE_SHIFT);
+    /**
+     * The Idr.
+     */
     static final String IDR = ".i";
 
+    /**
+     * The Dbr.
+     */
     static final String DBR = ".d";
 
     /**
      * Maximal number of pages in single file.
      * Calculated so that each file will have 1 GB
      */
-    final static long PAGES_PER_FILE = (1024 * 1024 * 1024) >>> 12;
+    final static long PAGES_PER_FILE = (1024 * 1024 * 1024 * 4l) >>> 12;
 
     private ArrayList<FileChannel> channels = new ArrayList<FileChannel>();
     private ArrayList<FileChannel> channelsTranslation = new ArrayList<FileChannel>();
     private IdentityHashMap<FileChannel, MappedByteBuffer> buffers = new IdentityHashMap<FileChannel, MappedByteBuffer>();
+    /*head=128kb,32页面*/
+//    public IdentityHashMap<FileChannel, MappedByteBuffer> headbuffers = new IdentityHashMap<FileChannel, MappedByteBuffer>();
 
+    public MappedByteBuffer headbuff;
     private String fileName;
     private boolean transactionsDisabled;
     private boolean readonly;
     private boolean lockingDisabled;
 
+    /**
+     * Instantiates a new M storage.
+     *
+     * @param fileName             the file name
+     * @param readonly             the readonly
+     * @param transactionsDisabled the transactions disabled
+     * @param lockingDisabled      the locking disabled
+     * @throws IOException the io exception
+     */
     public MStorage(String fileName, boolean readonly, boolean transactionsDisabled, boolean lockingDisabled) throws IOException {
         this.fileName = fileName;
         this.transactionsDisabled = transactionsDisabled;
@@ -69,6 +123,7 @@ class MStorage {
     private FileChannel getChannel(long pageNumber) throws IOException {
         int fileNumber = (int) (Math.abs(pageNumber) / PAGES_PER_FILE);
 
+
         List<FileChannel> c = pageNumber >= 0 ? channels : channelsTranslation;
 
         //increase capacity of array lists if needed
@@ -78,20 +133,62 @@ class MStorage {
 
         FileChannel ret = c.get(fileNumber);
         if (ret == null) {
+            boolean init = false;
             String name = makeFileName(fileName, pageNumber, fileNumber);
             ret = new RandomAccessFile(name, "rw").getChannel();
+            if (ret.size() < 128 * 1024) {
+                init = true;
+            }
             c.set(fileNumber, ret);
-            buffers.put(ret, ret.map(FileChannel.MapMode.READ_WRITE, 0, ret.size()));
+            MappedByteBuffer map = ret.map(FileChannel.MapMode.READ_WRITE, 0, ret.size());
+            buffers.put(ret, map);
+            headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 132 * 1024);
+            if (init) {
+                unmapBuffer(map);
+                map = ret.map(FileChannel.MapMode.READ_WRITE, 0, 64 * 1024 * 1024);
+                byte[] data = new byte[1024];
+                for (int i = 0; i < 1024 * 64; i++) {
+                    map.put(data);
+                }
+                map.force();
+                buffers.put(ret, map);
+                bitSet = new BitSet(Pagesize.MAXPAGENUMBER);
+                byte[] bytes = ObjectSeriaer.getbytes(bitSet);
+                headbuff.put(bytes);
+                headbuff.force();
+            } else {
+                byte[] bytes = new byte[130 * 1024];
+                headbuff.get(bytes);
+                bitSet = ObjectSeriaer.geto(bytes);
+                System.out.println(bitSet.size());
+                System.out.println(bitSet.get(1));
+
+            }
         }
         return ret;
     }
 
+    /**
+     * Make file name string.
+     *
+     * @param fileName   the file name
+     * @param pageNumber the page number
+     * @param fileNumber the file number
+     * @return the string
+     */
     static String makeFileName(String fileName, long pageNumber, int fileNumber) {
         return fileName + (pageNumber >= 0 ? DBR : IDR) + "." + fileNumber;
 //        return "E:\\迅雷下载\\ideaIU-2016.3.exe";
     }
 
 
+    /**
+     * Write.
+     *
+     * @param pageNumber the page number
+     * @param data       the data
+     * @throws IOException the io exception
+     */
     public void write(long pageNumber, ByteBuffer data) throws IOException {
         if (transactionsDisabled && data.isDirect()) {
             //if transactions are disabled and this buffer is direct,
@@ -137,6 +234,13 @@ class MStorage {
         }
     }
 
+    /**
+     * Read byte buffer.
+     *
+     * @param pageNumber the page number
+     * @return the byte buffer
+     * @throws IOException the io exception
+     */
     public ByteBuffer read(long pageNumber) throws IOException {
         FileChannel f = getChannel(pageNumber);
         int offsetInFile = (int) ((Math.abs(pageNumber) % PAGES_PER_FILE) * PAGE_SIZE);
@@ -163,6 +267,11 @@ class MStorage {
         return ret;
     }
 
+    /**
+     * Force close.
+     *
+     * @throws IOException the io exception
+     */
     public void forceClose() throws IOException {
         for (FileChannel f : channels) {
             if (f == null) continue;
@@ -180,6 +289,11 @@ class MStorage {
         buffers = null;
     }
 
+    /**
+     * Sync.
+     *
+     * @throws IOException the io exception
+     */
     public void sync() throws IOException {
         for (MappedByteBuffer b : buffers.values()) {
             b.force();
@@ -187,6 +301,12 @@ class MStorage {
     }
 
 
+    /**
+     * Open transaction log data output stream.
+     *
+     * @return the data output stream
+     * @throws IOException the io exception
+     */
     public DataOutputStream openTransactionLog() throws IOException {
         String logName = fileName + transaction_log_file_extension;
         final FileOutputStream fileOut = new FileOutputStream(logName);
@@ -202,11 +322,21 @@ class MStorage {
         };
     }
 
+    /**
+     * Delete all files.
+     *
+     * @throws IOException the io exception
+     */
     public void deleteAllFiles() throws IOException {
         deleteTransactionLog();
         deleteFiles(fileName);
     }
 
+    /**
+     * Delete files.
+     *
+     * @param fileName the file name
+     */
     static void deleteFiles(String fileName) {
         for (int i = 0; true; i++) {
             String name = makeFileName(fileName, +1, i);
@@ -225,6 +355,11 @@ class MStorage {
     }
 
 
+    /**
+     * Read transaction log data input stream.
+     *
+     * @return the data input stream
+     */
     public DataInputStream readTransactionLog() {
 
         File logFile = new File(fileName + transaction_log_file_extension);
@@ -254,12 +389,20 @@ class MStorage {
         return ois;
     }
 
+    /**
+     * Delete transaction log.
+     */
     public void deleteTransactionLog() {
         File logFile = new File(fileName + transaction_log_file_extension);
         if (logFile.exists())
             logFile.delete();
     }
 
+    /**
+     * Is readonly boolean.
+     *
+     * @return the boolean
+     */
     public boolean isReadonly() {
         return readonly;
     }

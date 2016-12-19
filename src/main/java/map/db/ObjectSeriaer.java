@@ -1,5 +1,6 @@
 package map.db;
 
+import map.htree.MHtree;
 import map.htree.MHtreeNode;
 import sun.security.util.BitArray;
 
@@ -42,20 +43,15 @@ public class ObjectSeriaer {
 
 
     public static void main(String[] args) {
-
-        byte[] bytes = new byte[100000];
-        byte[] bb = ObjectSeriaer.getbytes(bytes);
-        System.out.println(bb.length);
-        byte[] a = ObjectSeriaer.geto(bb);
-        System.out.println(a.length);
         BitSet bitArray = new BitSet(Pagesize.MAXPAGENUMBER);
         bitArray.set(1,true);
         bitArray.set(2,true);
+        bitArray.set(3,true);
         bitArray.set(9,true);
-        System.out.println(bitArray.toString());
-        System.out.println(ObjectSeriaer.getbytes(bitArray).length/1024l);
-        System.out.println(Pagesize.MAXPAGENUMBER*1024*4l/1024/1024/1024);
-        testtrenode();
+        for (int i = 0; i < 100; i++) {
+            bitArray.set(i + 1, true);
+        }
+        System.out.println(ObjectSeriaer.getbytes(bitArray).length);
     }
 
     private static void testtrenode() {
@@ -64,6 +60,9 @@ public class ObjectSeriaer {
         System.out.println(ObjectSeriaer.getbytes(mHtreeNode).length);
         mHtreeNode = ObjectSeriaer.geto(ObjectSeriaer.getbytes(mHtreeNode));
         System.out.println(mHtreeNode.code);
+        MHtree mHtree = new MHtree();
+        System.out.println(ObjectSeriaer.getbytes(mHtree).length);
+        System.out.println(MStorage.PAGES_PER_FILE);
     }
 
 }

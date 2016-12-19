@@ -1,5 +1,6 @@
 package map.htree;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -7,7 +8,7 @@ import java.util.stream.Collectors;
  * Created by jiang on 2016/12/19 0019.
  */
 @SuppressWarnings("Duplicates")
-public class MHtree implements Map<String,Object>{
+public class MHtree implements Map<String,Object>,Serializable{
      private   MHtreeNode root;
     public static List<MHtreeNode> nodes = new ArrayList<>(1000);
 

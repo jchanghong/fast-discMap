@@ -5,13 +5,12 @@ package map.db;
  */
 public interface MdiscIO {
 
-    short pagemagic = 111;//每个页面开始的2个字节
 
     /**
      * Write int.
      *
      * @param o the o
-     * @return the int 记录逻辑id
+     * @return the int 物理页面号！！！
      */
     int write(Object o);
 
