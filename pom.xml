@@ -32,7 +32,11 @@
             <version>4.12</version>
             <!--<scope>test</scope>-->
         </dependency>
-
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo-shaded</artifactId>
+            <version>4.0.0</version>
+        </dependency>
     </dependencies>
 
 </project>
