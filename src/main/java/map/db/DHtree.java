@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("Duplicates")
 public class DHtree implements Map<String,Object>,Serializable{
-     private   MHtreeNode root;
+     private MHtreeNode root;
 
    transient public static List<MHtreeNode> nodes = new ArrayList<>(1000);
 

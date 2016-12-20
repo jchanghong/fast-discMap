@@ -65,4 +65,17 @@ public class ObjectSeriaer {
         System.out.println(MStorage.PAGES_PER_FILE);
     }
 
+    /*
+     Kryo kryo = new Kryo();
+    // ...
+    Output output = new Output(new FileOutputStream("file.bin"));
+    SomeClass someObject = ...
+    kryo.writeObject(output, someObject);
+    output.close();
+    // ...
+    Input input = new Input(new FileInputStream("file.bin"));
+    SomeClass someObject = kryo.readObject(input, SomeClass.class);
+    input.close();
+    * */
+
 }

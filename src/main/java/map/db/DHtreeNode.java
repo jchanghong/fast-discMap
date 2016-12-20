@@ -1,7 +1,7 @@
 package map.db;
 
+
 import map.htree.MHashCodes;
-import map.htree.MHtree;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.io.ObjectOutput;
 /**
  * Created by jiang on 2016/12/19 0019.
  */
-public class DHtreeNode implements Comparable<DHtreeNode> ,Externalizable{
+public class DHtreeNode implements Comparable<DHtreeNode> ,Externalizable {
 
      public int high;//root si 0
      public int code;
@@ -73,12 +73,12 @@ public class DHtreeNode implements Comparable<DHtreeNode> ,Externalizable{
         if (childs == null) {
             childs = new DHtreeNode[code];
             childs[mycode] = new DHtreeNode(high + 1, key, values);
-            MHtree.nodes.add(childs[mycode]);
+//            MHtree.nodes.add(childs[mycode]);
             return values;
         }
         if (childs[mycode] == null) {
             childs[mycode] = new DHtreeNode(high + 1, key, values);
-            MHtree.nodes.add(childs[mycode]);
+//            MHtree.nodes.add(childs[mycode]);
             return values;
         }
         if (childs[mycode].hasV && childs[mycode].key.equals(key)) {
