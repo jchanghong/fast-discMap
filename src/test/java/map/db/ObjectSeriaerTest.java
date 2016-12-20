@@ -85,7 +85,7 @@ public class ObjectSeriaerTest {
     public void setUp() throws Exception {
 //        dHtreeNode.childs = new DHtreeNode[dHtreeNode.code];
 //        kryo.setReferences(false);
-        kryo.register(BitSet.class, 9);
+//        kryo.register(BitSet.class, 9);
        System.out.println(kryo.getSerializer(int[].class));
 
 
