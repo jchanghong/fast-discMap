@@ -6,10 +6,6 @@ import com.esotericsoftware.kryo.io.Output;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.BitSet;
 
 import static org.junit.Assert.*;
@@ -28,7 +24,7 @@ public class ObjectSeriaerTest {
             BitSet bitSet = new BitSet(Pagesize.max_page_number);
             byte[] getbytes = ObjectSeriaer.getbytes(bitSet);
             System.out.println(getbytes.length);
-            bitSet = ObjectSeriaer.geto(getbytes);
+//            bitSet = ObjectSeriaer.geto(getbytes);
             assertEquals(Pagesize.max_page_number, bitSet.size());
         }
     }
@@ -74,7 +70,7 @@ public class ObjectSeriaerTest {
             String string = "hhhhhhhhhh";
             byte[] getbytes = ObjectSeriaer.getbytes(string);
             System.out.println(getbytes.length);
-            string = ObjectSeriaer.geto(getbytes);
+//            string = ObjectSeriaer.geto(getbytes);
             assertEquals("hhhhhhhhhh", string);
         }
     }
@@ -110,9 +106,13 @@ public class ObjectSeriaerTest {
     @Test
     public void test111() throws Exception {
 
-        BitSet bitSet = new BitSet(100);
-        byte[] getbytes = ObjectSeriaer.getbytes2(bitSet);
-        bitSet = ObjectSeriaer.geto2(getbytes);
-        assertEquals(100, bitSet.size());
+        for (int i = 0; i < 2; i++) {
+            BitSet bitSet = new BitSet(Pagesize.max_page_number*10);
+            int size = bitSet.size();
+            byte[] getbytes = ObjectSeriaer.getbytes(bitSet);
+            System.out.println(getbytes.length);
+            bitSet = ObjectSeriaer.getObject(getbytes);
+            assertEquals(size, bitSet.size());
+        }
     }
 }

@@ -1,15 +1,21 @@
 package map.util;
 
 import java.nio.ByteBuffer;
+import java.util.BitSet;
 
 /**
  * Created by jiang on 2016/12/20 0020.
- * 位置从0开始-size-1
+ * 位置从0开始-size-1,直接操作文件头
  * true falues 代表1,0
  */
 public class BitArray {
     ByteBuffer buffer;
 
+    /**
+     * Instantiates a new Bit array.
+     *
+     * @param buffer the buffer mapbuff
+     */
     public BitArray(ByteBuffer buffer) {
         this.buffer = buffer;
     }
@@ -32,6 +38,12 @@ public class BitArray {
     public boolean get(int index) {
         buffer.position(0);
         byte b1 = buffer.get(index / 8);
+        if (b1 < 0) {
+            int bb = 255;
+            int indexinbyte = index % 8;
+            byte b = (byte) (bb >>> (7 - indexinbyte));
+            return (b &1)== 1 ? true : false;
+        }
         int indexinbyte = index % 8;
         byte b = (byte) (b1 >> (7 - indexinbyte));
         return b == 1 ? true : false;
@@ -54,7 +66,7 @@ public class BitArray {
             buffer.put(index / 8, b1);
             return;
         }
-        byte b3 = (byte) ((1 << 8) - 1 - (1 << 7 >>> indexinbyte));
+        int b3 = (255 - (1 << 7 >>> indexinbyte));
         b1 = (byte) (b1 & b3);
         buffer.position(0);
         buffer.put(index / 8, b1);
@@ -62,15 +74,14 @@ public class BitArray {
     }
 
     public static void main(String[] sss) {
-        ByteBuffer byteBuffer = ByteBuffer.allocate(3);
-        BitArray array = new BitArray(byteBuffer);
-        array.set(22, true);
-        array.set(21, true);
-        array.set(23, true);
-        System.out.println(array.get(22));
-        byteBuffer.position(2);
-        System.out.println(byteBuffer.get());
-//        System.out.println(array.size());
+
+        BitSet bitSet = new BitSet(8);
+        bitSet.set(6, true);
+        System.out.println(bitSet.get(6));
+        System.out.println(bitSet.hashCode());
+        BitSet bitSet1 = new BitSet(8);
+        bitSet.and(bitSet1);
+        System.out.println(bitSet.get(6));
 
     }
 }

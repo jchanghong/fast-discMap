@@ -1,8 +1,10 @@
 package map.db;
 
-import map.htree.MHtreeNode;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoSerializable;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,16 +12,27 @@ import java.util.stream.Collectors;
  * Created by jiang on 2016/12/19 0019.
  */
 @SuppressWarnings("Duplicates")
-public class DHtree implements Map<String,Object>,Serializable{
-     private MHtreeNode root;
-
-   transient public static List<MHtreeNode> nodes = new ArrayList<>(1000);
+public class DHtree implements Map<String,Object>,KryoSerializable{
+    static {
+        ObjectSeriaer.kryo.register(DHtree.class, 23);
+    }
+     public DHtreeNode root;
+    @Override
+    public void write(Kryo kryo, Output output) {
+        kryo.writeObjectOrNull(output, root, DHtreeNode.class);
+    }
+    @Override
+    public void read(Kryo kryo, Input input) {
+        root = kryo.readObjectOrNull(input, DHtreeNode.class);
+    }
+   transient public static List<DHtreeNode> nodes = new ArrayList<>(1000);
 
     public DHtree() {
-        root = new MHtreeNode(0, null, null);
+        root = new DHtreeNode(0, null, null);
         nodes.clear();
         nodes.add(root);
-        root.childs = new MHtreeNode[root.code];
+        root.childs = new int[root.code];
+        root.childsm = new DHtreeNode[root.code];
     }
 
     @Override
@@ -50,7 +63,7 @@ public class DHtree implements Map<String,Object>,Serializable{
         }
         int hashcode = Math.abs(key.hashCode());
         int code0 = hashcode %root.code;
-        MHtreeNode node = root.childs[code0];
+        DHtreeNode node = root.childsm[code0];
         if (node == null) {
             return null;
         }
@@ -69,10 +82,10 @@ public class DHtree implements Map<String,Object>,Serializable{
         }
         int hashcode = Math.abs(key.hashCode());
         int code0 = hashcode % root.code;
-        MHtreeNode node = root.childs[code0];
+        DHtreeNode node = root.childsm[code0];
         if (node == null) {
-            root.childs[code0] = new MHtreeNode(1, key, value);
-            DHtree.nodes.add(root.childs[code0]);
+            root.childsm[code0] = new DHtreeNode(1, key, value);
+            DHtree.nodes.add(root.childsm[code0]);
             return null;
         }
         else {
@@ -100,7 +113,7 @@ public class DHtree implements Map<String,Object>,Serializable{
         }
         int hashcode = Math.abs(key.hashCode());
         int code0 = hashcode % root.code;
-        MHtreeNode node = root.childs[code0];
+        DHtreeNode node = root.childsm[code0];
         if (node == null) {
             return null;
         }
@@ -123,7 +136,7 @@ public class DHtree implements Map<String,Object>,Serializable{
 
     @Override
     public void clear() {
-        for (MHtreeNode node : nodes) {
+        for (DHtreeNode node : nodes) {
             node.hasV = false;
         }
     }
@@ -166,4 +179,6 @@ public class DHtree implements Map<String,Object>,Serializable{
     public String toString() {
         return super.toString();
     }
+
+
 }

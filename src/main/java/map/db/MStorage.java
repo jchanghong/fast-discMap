@@ -1,9 +1,7 @@
 package map.db;
 
-import map.util.BitArray;
 import sun.misc.Cleaner;
 
-import javax.xml.ws.spi.http.HttpHandler;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -16,10 +14,10 @@ import java.util.List;
 
 /**
  * The type M storage.
+ * 文件前面2m保留做头信息1024*1024*2/4096=512页面
  */
 class MStorage {
-    public static BitArray bitArray;
-
+    public static BitSet bitSet;
     public MStorage(String fileName)  {
         this.fileName = fileName;
         this.transactionsDisabled = true;
@@ -35,7 +33,6 @@ class MStorage {
         } catch (OverlappingFileLockException e) {
             throw new NullPointerException("Could not lock DB file: " + fileName);
         }
-
     }
 
     /**
@@ -46,16 +43,10 @@ class MStorage {
      */
     public static void main(String[] args) throws IOException {
         MStorage storage = new MStorage("d");
-//128kb
-        for (int i = 0; i < 32; i++) {
-//            bitSet.set(i + 1, true);
-        }
-//        storage.updatehead();
-
-//        ByteBuffer byteBuffer = storage.read(1);
-//        System.out.println(byteBuffer.limit());
-//        storage.write(1, byteBuffer);
-
+        System.out.println(storage.bitSet.size()==Pagesize.max_page_number);
+        System.out.println(storage.bitSet.get(1));
+        System.out.println(storage.bitSet.get(33));
+//        storage.inithead();
     }
 
     /**
@@ -66,6 +57,13 @@ class MStorage {
      * The Clean data.
      */
     static final byte[] CLEAN_DATA = new byte[Pagesize.page_size];
+//    static final byte[] all_zear_bytes = new byte[Pagesize.page_size];
+//    static {
+//        for (int i = 0; i < Pagesize.page_size; i++) {
+//            all_zear_bytes[i] = 0;
+//        }
+//    }
+
     /**
      * use 'val & OFFSET_MASK' to quickly get offset within the page;
      */
@@ -80,18 +78,10 @@ class MStorage {
      */
     static final String DBR = ".d";
 
-    /**
-     * Maximal number of pages in single file.
-     * Calculated so that each file will have 1 GB
-     */
-    final static long PAGES_PER_FILE = (1024 * 1024 * 1024 * 4l) >>> 12;
-
     private ArrayList<FileChannel> channels = new ArrayList<FileChannel>();
     private ArrayList<FileChannel> channelsTranslation = new ArrayList<FileChannel>();
     private IdentityHashMap<FileChannel, MappedByteBuffer> buffers = new IdentityHashMap<FileChannel, MappedByteBuffer>();
     /*head=128kb,32页面*/
-//    public IdentityHashMap<FileChannel, MappedByteBuffer> headbuffers = new IdentityHashMap<FileChannel, MappedByteBuffer>();
-
     public MappedByteBuffer headbuff;
     private String fileName;
     private boolean transactionsDisabled;
@@ -117,6 +107,7 @@ class MStorage {
         try {
             if (!lockingDisabled)
                 getChannel(0).lock();
+
         } catch (IOException e) {
             throw new IOException("Could not lock DB file: " + fileName, e);
         } catch (OverlappingFileLockException e) {
@@ -126,8 +117,7 @@ class MStorage {
     }
 
     private FileChannel getChannel(long pageNumber) throws IOException {
-        int fileNumber = (int) (Math.abs(pageNumber) / PAGES_PER_FILE);
-
+        int fileNumber = (int) (Math.abs(pageNumber) / Pagesize.max_page_number);
 
         List<FileChannel> c = pageNumber >= 0 ? channels : channelsTranslation;
 
@@ -138,39 +128,50 @@ class MStorage {
 
         FileChannel ret = c.get(fileNumber);
         if (ret == null) {
-            boolean init = false;
             String name = makeFileName(fileName, pageNumber, fileNumber);
+            initfileif(name);
             ret = new RandomAccessFile(name, "rw").getChannel();
+            MappedByteBuffer map;
             if (ret.size() < 128 * 1024) {
-                init = true;
-            }
-            c.set(fileNumber, ret);
-            MappedByteBuffer map = ret.map(FileChannel.MapMode.READ_WRITE, 0, ret.size());
-            buffers.put(ret, map);
-            headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 132 * 1024);
-            if (init) {
-                unmapBuffer(map);
-                map = ret.map(FileChannel.MapMode.READ_WRITE, 0, 64 * 1024 * 1024);
-                byte[] data = new byte[1024];
-                for (int i = 0; i < 1024 * 64; i++) {
-                    map.put(data);
+                map = ret.map(FileChannel.MapMode.READ_WRITE, 0, 64*1024*1024);
+                for (int i = 0; i < 1024 *16; i++) {
+                    map.put(CLEAN_DATA);
                 }
                 map.force();
-                buffers.put(ret, map);
-//                bitSet = new BitSet(Pagesize.max_page_number);
-//                byte[] bytes = ObjectSeriaer.getbytes(bitSet);
-//                headbuff.put(bytes);
-                headbuff.force();
-            } else {
-                byte[] bytes = new byte[130 * 1024];
-                headbuff.get(bytes);
-//                bitSet = ObjectSeriaer.geto(bytes);
-//                System.out.println(bitSet.size());
-//                System.out.println(bitSet.get(1));
-
+                if (headbuff == null) {
+                    headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 17 * 1024);
+                }
+                bitSet = new BitSet(Pagesize.max_page_number);
+                for (int i = 0; i < 512; i++) {
+                    bitSet.set(i + 1, true);
+                }
+                headbuff.put(ObjectSeriaer.getbytes(bitSet));
+            }
+            else {
+                map = ret.map(FileChannel.MapMode.READ_WRITE, 0, ret.size());
+            }
+            c.set(fileNumber, ret);
+            buffers.put(ret, map);
+            if (headbuff == null) {
+                headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 17 * 1024);
+                byte[] buff = new byte[16407];
+                headbuff.get(buff);
+                bitSet = ObjectSeriaer.getObject(buff);
             }
         }
         return ret;
+    }
+
+    private void initfileif(String name) {
+        File file = new File("name");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     /**
@@ -203,7 +204,7 @@ class MStorage {
         }
 
         FileChannel f = getChannel(pageNumber);
-        int offsetInFile = (int) ((Math.abs(pageNumber) % PAGES_PER_FILE) * Pagesize.page_size);
+        int offsetInFile = (int) ((Math.abs(pageNumber) % Pagesize.max_page_number) * Pagesize.page_size);
         MappedByteBuffer b = buffers.get(f);
         if (b.limit() <= offsetInFile) {
 
@@ -213,7 +214,7 @@ class MStorage {
             increment -= increment % Pagesize.page_size;
 
             long newFileSize = offsetInFile + Pagesize.page_size + increment;
-            newFileSize = Math.min(PAGES_PER_FILE * Pagesize.page_size, newFileSize);
+            newFileSize = Math.min(Pagesize.max_page_number * Pagesize.page_size, newFileSize);
 
             //expand file size
             f.position(newFileSize - 1);
@@ -248,7 +249,7 @@ class MStorage {
      */
     public ByteBuffer read(long pageNumber) throws IOException {
         FileChannel f = getChannel(pageNumber);
-        int offsetInFile = (int) ((Math.abs(pageNumber) % PAGES_PER_FILE) * Pagesize.page_size);
+        int offsetInFile = (int) ((Math.abs(pageNumber) % Pagesize.max_page_number) * Pagesize.page_size);
         MappedByteBuffer b = buffers.get(f);
 
         if (b == null) { //not mapped yet

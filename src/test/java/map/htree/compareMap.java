@@ -16,16 +16,16 @@ public class compareMap {
   static   Map<String, Object> maptree = new TreeMap<>();
   static   Map<String, Object> mapconcur = new ConcurrentHashMap<>();
   static   List<String> list = new ArrayList<>();
-  static   int sum = 10000;
-
-    public static void main(String[] args) throws Exception {
-        long st = System.nanoTime();
-        for (int i = 0; i < sum; i++) {
-            Collections.binarySearch(list, i + "asdf");
-        }
-        System.out.println(System.nanoTime()-st);
-
-    }
+  static   int sum = 100000;
+//
+//    public static void main(String[] args) throws Exception {
+//        long st = System.nanoTime();
+//        for (int i = 0; i < sum; i++) {
+//            Collections.binarySearch(list, i + "asdf");
+//        }
+//        System.out.println(System.nanoTime()-st);
+//
+//    }
 
     @Before
     public void setUp() throws Exception {

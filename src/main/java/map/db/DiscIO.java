@@ -8,9 +8,15 @@ import java.nio.ByteBuffer;
 
 /**
  * Created by jiang on 2016/12/19 0019.
+ * 和内存指针差不多
+ * new 得到地址
  */
 @SuppressWarnings("ControlFlowStatementWithoutBraces")
 public class DiscIO implements MdiscIO {
+    private static DiscIO instn = new DiscIO(new MStorage("d"));
+    public static DiscIO getInstance() {
+        return instn;
+    }
     MStorage storage;
     Pagemanager pagemanager;
     public DiscIO(MStorage storage) {
@@ -63,10 +69,10 @@ public class DiscIO implements MdiscIO {
             buffer.get(buff);
             MHtreeNode mHtreeNode = null;
             if (type == Pagesize.pagehead_node) {
-                mHtreeNode = ObjectSeriaer.geto(buff);
+//                mHtreeNode = ObjectSeriaer.geto(buff);
                 return mHtreeNode;
             }
-            return ObjectSeriaer.geto(buff);
+//            return ObjectSeriaer.geto(buff);
         } catch (IOException e) {
             e.printStackTrace();
         }
