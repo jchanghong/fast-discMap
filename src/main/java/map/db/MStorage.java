@@ -1,5 +1,6 @@
 package map.db;
 
+import map.util.BitArray;
 import sun.misc.Cleaner;
 
 import javax.xml.ws.spi.http.HttpHandler;
@@ -17,9 +18,9 @@ import java.util.List;
  * The type M storage.
  */
 class MStorage {
-    public static BitSet bitSet;
+    public static BitArray bitArray;
 
-    public MStorage(String fileName) throws IOException {
+    public MStorage(String fileName)  {
         this.fileName = fileName;
         this.transactionsDisabled = true;
         this.readonly = false;
@@ -30,9 +31,9 @@ class MStorage {
             if (!lockingDisabled)
                 getChannel(0).lock();
         } catch (IOException e) {
-            throw new IOException("Could not lock DB file: " + fileName, e);
+            throw new NullPointerException("Could not lock DB file: " + fileName);
         } catch (OverlappingFileLockException e) {
-            throw new IOException("Could not lock DB file: " + fileName, e);
+            throw new NullPointerException("Could not lock DB file: " + fileName);
         }
 
     }
@@ -44,13 +45,12 @@ class MStorage {
      * @throws IOException the io exception
      */
     public static void main(String[] args) throws IOException {
-        MStorage storage = new MStorage("d", false, false, false);
-        storage.transactionsDisabled = true;
-//132/4
-        for (int i = 0; i < 33; i++) {
-            bitSet.set(i + 1, true);
+        MStorage storage = new MStorage("d");
+//128kb
+        for (int i = 0; i < 32; i++) {
+//            bitSet.set(i + 1, true);
         }
-        storage.updatehead();
+//        storage.updatehead();
 
 //        ByteBuffer byteBuffer = storage.read(1);
 //        System.out.println(byteBuffer.limit());
@@ -58,31 +58,18 @@ class MStorage {
 
     }
 
-    public void updatehead() {
-        headbuff.position(0);
-        headbuff.put(ObjectSeriaer.getbytes(bitSet));
-    }
-
     /**
      * The Transaction log file extension.
      */
     static final String transaction_log_file_extension = ".t";
     /**
-     * The Page size shift.
-     */
-    static final int PAGE_SIZE_SHIFT = 12;
-    /**
-     * The Page size.
-     */
-    static final int PAGE_SIZE = 1 << PAGE_SIZE_SHIFT;
-    /**
      * The Clean data.
      */
-    static final byte[] CLEAN_DATA = new byte[MStorage.PAGE_SIZE];
+    static final byte[] CLEAN_DATA = new byte[Pagesize.page_size];
     /**
      * use 'val & OFFSET_MASK' to quickly get offset within the page;
      */
-    static final long OFFSET_MASK = 0xFFFFFFFFFFFFFFFFL >>> (64 - MStorage.PAGE_SIZE_SHIFT);
+    static final long OFFSET_MASK = 0xFFFFFFFFFFFFFFFFL >>> (64 -12);
     /**
      * The Idr.
      */
@@ -170,16 +157,16 @@ class MStorage {
                 }
                 map.force();
                 buffers.put(ret, map);
-                bitSet = new BitSet(Pagesize.MAXPAGENUMBER);
-                byte[] bytes = ObjectSeriaer.getbytes(bitSet);
-                headbuff.put(bytes);
+//                bitSet = new BitSet(Pagesize.max_page_number);
+//                byte[] bytes = ObjectSeriaer.getbytes(bitSet);
+//                headbuff.put(bytes);
                 headbuff.force();
             } else {
                 byte[] bytes = new byte[130 * 1024];
                 headbuff.get(bytes);
-                bitSet = ObjectSeriaer.geto(bytes);
-                System.out.println(bitSet.size());
-                System.out.println(bitSet.get(1));
+//                bitSet = ObjectSeriaer.geto(bytes);
+//                System.out.println(bitSet.size());
+//                System.out.println(bitSet.get(1));
 
             }
         }
@@ -216,17 +203,17 @@ class MStorage {
         }
 
         FileChannel f = getChannel(pageNumber);
-        int offsetInFile = (int) ((Math.abs(pageNumber) % PAGES_PER_FILE) * PAGE_SIZE);
+        int offsetInFile = (int) ((Math.abs(pageNumber) % PAGES_PER_FILE) * Pagesize.page_size);
         MappedByteBuffer b = buffers.get(f);
         if (b.limit() <= offsetInFile) {
 
             //remapping buffer for each newly added page would be slow,
             //so allocate new size in chunks
-            int increment = Math.min(PAGE_SIZE * 1024, offsetInFile / 10);
-            increment -= increment % PAGE_SIZE;
+            int increment = Math.min(Pagesize.page_size * 1024, offsetInFile / 10);
+            increment -= increment % Pagesize.page_size;
 
-            long newFileSize = offsetInFile + PAGE_SIZE + increment;
-            newFileSize = Math.min(PAGES_PER_FILE * PAGE_SIZE, newFileSize);
+            long newFileSize = offsetInFile + Pagesize.page_size + increment;
+            newFileSize = Math.min(PAGES_PER_FILE * Pagesize.page_size, newFileSize);
 
             //expand file size
             f.position(newFileSize - 1);
@@ -261,7 +248,7 @@ class MStorage {
      */
     public ByteBuffer read(long pageNumber) throws IOException {
         FileChannel f = getChannel(pageNumber);
-        int offsetInFile = (int) ((Math.abs(pageNumber) % PAGES_PER_FILE) * PAGE_SIZE);
+        int offsetInFile = (int) ((Math.abs(pageNumber) % PAGES_PER_FILE) * Pagesize.page_size);
         MappedByteBuffer b = buffers.get(f);
 
         if (b == null) { //not mapped yet
@@ -276,7 +263,7 @@ class MStorage {
 
         b.position(offsetInFile);
         ByteBuffer ret = b.slice();
-        ret.limit(PAGE_SIZE);
+        ret.limit(Pagesize.page_size);
         if (!transactionsDisabled || readonly) {
             // changes written into buffer will be directly written into file
             // so we need to protect buffer from modifications

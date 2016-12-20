@@ -5,7 +5,7 @@ package map.db;
  */
 public class IDmap  implements Pagesize{
     public static void main(String[] args) {
-        long x = M7 + M1 + M2 + M3 + M4 + M5 + M6;
+        long x = M7 + + M2 + M3 + M4 + M5 + M6;
         long y=1024 * 1024 * 64;
         System.out.println(y / x);
     }

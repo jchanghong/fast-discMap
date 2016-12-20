@@ -15,10 +15,13 @@ public class DHtreeNode implements Comparable<DHtreeNode> ,Externalizable {
 
      public int high;//root si 0
      public int code;
-    public DHtreeNode[] childs;
+    //    public DHtreeNode[] childs;
+//    public int[] ints = new int[1000];
     public boolean hasV;
     public String key;
     public Object values;
+    int gdddd = 0;
+
 
     public DHtreeNode() {
     }
@@ -26,7 +29,7 @@ public class DHtreeNode implements Comparable<DHtreeNode> ,Externalizable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.write(high);
-        out.writeObject(childs);
+//        out.writeObject(childs);
         out.writeBoolean(hasV);
         out.writeObject(key);
         out.writeObject(values);
@@ -37,7 +40,7 @@ public class DHtreeNode implements Comparable<DHtreeNode> ,Externalizable {
 
       this.high = in.read();
         this.code = MHashCodes.codes[high];
-        childs = (DHtreeNode[]) in.readObject();
+//        childs = (DHtreeNode[]) in.readObject();
         hasV = in.readBoolean();
         try {
             key = (String) in.readObject();
@@ -70,29 +73,29 @@ public class DHtreeNode implements Comparable<DHtreeNode> ,Externalizable {
      */
     public Object putchild(String key, Object values, int hashcode) {
         int mycode = hashcode % code;
-        if (childs == null) {
-            childs = new DHtreeNode[code];
-            childs[mycode] = new DHtreeNode(high + 1, key, values);
+//        if (childs == null) {
+//            childs = new DHtreeNode[code];
+//            childs[mycode] = new DHtreeNode(high + 1, key, values);
 //            MHtree.nodes.add(childs[mycode]);
-            return values;
-        }
-        if (childs[mycode] == null) {
-            childs[mycode] = new DHtreeNode(high + 1, key, values);
+//            return values;
+//        }
+//        if (childs[mycode] == null) {
+//            childs[mycode] = new DHtreeNode(high + 1, key, values);
 //            MHtree.nodes.add(childs[mycode]);
-            return values;
-        }
-        if (childs[mycode].hasV && childs[mycode].key.equals(key)) {
-            childs[mycode].values = values;
-            return childs[mycode].values;
-        }
-        if (!childs[mycode].hasV) {
-            childs[mycode].key = key;
-            childs[mycode].hasV = true;
-            childs[mycode].values = values;
-            return null;
-        }
-        return childs[mycode].putchild(key, values, hashcode);
-
+//            return values;
+//        }
+//        if (childs[mycode].hasV && childs[mycode].key.equals(key)) {
+//            childs[mycode].values = values;
+//            return childs[mycode].values;
+//        }
+//        if (!childs[mycode].hasV) {
+//            childs[mycode].key = key;
+//            childs[mycode].hasV = true;
+//            childs[mycode].values = values;
+//            return null;
+//        }
+//        return childs[mycode].putchild(key, values, hashcode);
+        return null;
     }
 
     /**
@@ -105,16 +108,17 @@ public class DHtreeNode implements Comparable<DHtreeNode> ,Externalizable {
      */
     public Object getChild(Object key, int hashcode) {
         int mycode = hashcode % code;
-        if (childs == null) {
-            return null;
-        }
-        if (childs[mycode] == null) {
-            return null;
-        }
-        if (childs[mycode].hasV && childs[mycode].key.equals(key)) {
-            return childs[mycode].values;
-        }
-        return childs[mycode].getChild(key, hashcode);
+//        if (childs == null) {
+//            return null;
+//        }
+//        if (childs[mycode] == null) {
+//            return null;
+//        }
+//        if (childs[mycode].hasV && childs[mycode].key.equals(key)) {
+//            return childs[mycode].values;
+//        }
+//        return childs[mycode].getChild(key, hashcode);
+        return null;
     }
 
     /**
@@ -127,17 +131,18 @@ public class DHtreeNode implements Comparable<DHtreeNode> ,Externalizable {
      */
     public Object removeChild(Object key, int hashcode) {
         int mycode = hashcode % code;
-        if (childs == null) {
-            return null;
-        }
-        if (childs[mycode] == null) {
-            return null;
-        }
-        if (childs[mycode].hasV && childs[mycode].key.equals(key)) {
-            childs[mycode].hasV = false;
-            return childs[mycode].values;
-        }
-        return childs[mycode].removeChild(key, hashcode);
+//        if (childs == null) {
+//            return null;
+//        }
+//        if (childs[mycode] == null) {
+//            return null;
+//        }
+//        if (childs[mycode].hasV && childs[mycode].key.equals(key)) {
+//            childs[mycode].hasV = false;
+//            return childs[mycode].values;
+//        }
+//        return childs[mycode].removeChild(key, hashcode);
+        return null;
     }
 
     @Override

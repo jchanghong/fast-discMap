@@ -19,19 +19,18 @@ public class Pagemanager {
      */
 //0开始
     public int[] getfreepanages(int recsize) {
-        int sum = (recsize-1) / MStorage.PAGE_SIZE + 1;
+        int sum = (recsize-1) / Pagesize.page_size + 1;
         int[] ints = new int[sum];
         int index = 0;
-        for (int i = 33; i < Pagesize.MAXPAGENUMBER; i++) {
-            if (!MStorage.bitSet.get(i + 1)) {
-                ints[index++] = i;
-                MStorage.bitSet.set(i+1,true);
-                if (index >= sum) {
-                    break;
-                }
-            }
+        for (int i = 33; i < Pagesize.max_page_number; i++) {
+//            if (!MStorage.bitSet.get(i + 1)) {
+//                ints[index++] = i;
+//                MStorage.bitSet.set(i+1,true);
+//                if (index >= sum) {
+//                    break;
+//                }
+//            }
         }
-        storage.updatehead();
         return ints;
     }
     public static void main(String[] args) throws IOException {

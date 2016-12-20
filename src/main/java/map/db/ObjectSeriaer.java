@@ -1,8 +1,9 @@
 package map.db;
 
-import map.htree.MHtree;
-import map.htree.MHtreeNode;
-import sun.security.util.BitArray;
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoException;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 import java.io.*;
 import java.util.BitSet;
@@ -12,8 +13,10 @@ import java.util.BitSet;
  */
 @SuppressWarnings("TryWithIdenticalCatches")
 public class ObjectSeriaer {
+    //KryoException
+    static Kryo kryo = new Kryo();
     private static byte[] buff = new byte[1024 * 4];
-
+    static Output output = new Output(buff);
 
     public static byte[] getbytes(Object o) {
         try {
@@ -25,6 +28,27 @@ public class ObjectSeriaer {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static byte[] getbytes2(Object o) {
+        output.clear();
+        try {
+            kryo.writeObject(output, o);
+            output.flush();
+        } catch (KryoException e) {
+            do {
+                buff = new byte[buff.length * 2];
+                output = new Output(buff);
+                e.printStackTrace();
+                try {
+                    kryo.writeObject(output, o);
+                    break;
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            } while (true);
+        }
+        return output.toBytes();
     }
 
     public static <T> T geto(byte[] buff) {
@@ -41,41 +65,41 @@ public class ObjectSeriaer {
         return null;
     }
 
+    public static <T> T geto2(byte[] buff) {
+        Input input = new Input(buff);
+        return (T) kryo.readObject(input,Object.class);
+    }
+
 
     public static void main(String[] args) {
-        BitSet bitArray = new BitSet(Pagesize.MAXPAGENUMBER);
-        bitArray.set(1,true);
-        bitArray.set(2,true);
-        bitArray.set(3,true);
-        bitArray.set(9,true);
-        for (int i = 0; i < 100; i++) {
-            bitArray.set(i + 1, true);
-        }
-        System.out.println(ObjectSeriaer.getbytes(bitArray).length);
+        testtrenode();
     }
 
     private static void testtrenode() {
-        MHtreeNode mHtreeNode = new MHtreeNode(0, null, null);
-//        mHtreeNode.childs = new MHtreeNode[mHtreeNode.code];
-        System.out.println(ObjectSeriaer.getbytes(mHtreeNode).length);
-        mHtreeNode = ObjectSeriaer.geto(ObjectSeriaer.getbytes(mHtreeNode));
-        System.out.println(mHtreeNode.code);
-        MHtree mHtree = new MHtree();
-        System.out.println(ObjectSeriaer.getbytes(mHtree).length);
-        System.out.println(MStorage.PAGES_PER_FILE);
-    }
+        long s = System.nanoTime();
+        for (int i = 0; i < 20; i++) {
 
-    /*
-     Kryo kryo = new Kryo();
-    // ...
-    Output output = new Output(new FileOutputStream("file.bin"));
-    SomeClass someObject = ...
-    kryo.writeObject(output, someObject);
-    output.close();
-    // ...
-    Input input = new Input(new FileInputStream("file.bin"));
-    SomeClass someObject = kryo.readObject(input, SomeClass.class);
-    input.close();
-    * */
+            BitSet bitSet = new BitSet(Pagesize.max_page_number);
+            byte[] getbytes = ObjectSeriaer.getbytes(bitSet);
+//            System.out.println(getbytes.length);
+            bitSet = ObjectSeriaer.geto(getbytes);
+        }
+        System.out.println("javatime" + (System.nanoTime() - s) / 1000l);
+        s = System.nanoTime();
+        for (int i = 0; i < 20; i++) {
+            Kryo kryo = new Kryo();
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(2048);
+            Output output = new Output(outputStream);
+            BitSet bitSet = new BitSet(Pagesize.max_page_number);
+            bitSet.set(3, true);
+            kryo.writeObject(output, bitSet);
+            output.close();
+            byte[] buf = outputStream.toByteArray();
+//            System.out.println(buf.length);
+            Input input = new Input(new ByteArrayInputStream(buf));
+            bitSet = kryo.readObject(input, BitSet.class);
+        }
+        System.out.println("yotime" + (System.nanoTime() - s) / 1000l);
+    }
 
 }
