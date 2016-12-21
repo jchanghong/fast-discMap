@@ -4,8 +4,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by jiang on 2016/12/21 0021.
  */
@@ -15,7 +13,7 @@ public class DHtreeTest {
     @Before
     public void setUp() throws Exception {
         db = DB.getInstance("d");
-        dHtree = (DHtree) db.createmap("mymap");
+        dHtree = (DHtree) db.createorGetmap("mymap");
     }
 
     @After

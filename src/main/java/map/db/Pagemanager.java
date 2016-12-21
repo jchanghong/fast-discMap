@@ -4,6 +4,7 @@ import java.io.IOException;
 
 /**
  * Created by jiang on 2016/12/19 0019.
+ * 页面分配
  */
 public class Pagemanager {
     MStorage storage;
@@ -38,6 +39,7 @@ public class Pagemanager {
         int[] getfreepanages = pagemanager.getfreepanages(4096);
         System.out.println(getfreepanages[0]);
         System.out.println(getfreepanages.length);
+
 
     }
 

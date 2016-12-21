@@ -1,7 +1,5 @@
 package map.db;
 
-import map.htree.HtreeTest;
-
 import java.nio.MappedByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +9,7 @@ import java.util.Map;
  */
 public class DB {
     private void updatemap() {
-        if (map_map==null||map_map.size() < 1) {
+        if (map_map==null) {
             map_map = new HashMap<>();
         }
         headbuff.position(128 * 1024);
@@ -30,15 +28,15 @@ public class DB {
 
     public static void main(String[] args) {
         db = DB.getInstance("d");
-        db.createmap("map4");
-        db.createmap("map5");
-//        Map<String,Object> htree = db.createmap("map1");
+        db.createorGetmap("map4");
+        db.createorGetmap("map5");
+//        Map<String,Object> htree = db.createorGetmap("map1");
         DHtree dHtree = (DHtree) db.getmap("map4");
         System.out.println(dHtree.name);
          dHtree = (DHtree) db.getmap("map5");
         System.out.println(dHtree.name);
 
-        db.createmap("mymap");
+        db.createorGetmap("mymap");
         dHtree = (DHtree) db.getmap("mymap");
         System.out.println(dHtree.root);
 
@@ -71,7 +69,7 @@ public class DB {
         int index = map_map.get(mapname);
         return discIO.read(index);
     }
-    public  Map<String, Object> createmap(String mapname) {
+    public  Map<String, Object> createorGetmap(String mapname) {
         if (map_map.containsKey(mapname)) {
             return getmap(mapname);
         }
@@ -79,7 +77,7 @@ public class DB {
         int in = discIO.write(htree);
         map_map.put(mapname, in);
         updatemap();
-        System.out.println(in);
+//        System.out.println(in);
         return htree;
     }
 

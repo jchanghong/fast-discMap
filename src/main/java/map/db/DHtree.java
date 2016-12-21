@@ -94,7 +94,7 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
             return null;
         } else {
             DHtreeNode chid = io.read(node);
-            if (chid.hasV && chid.equals(key)) {
+            if (chid.hasV && chid.key.equals(key)) {
                 return chid.values;
             }
             return chid.getChild(key, hashcode);
@@ -112,7 +112,7 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
         if (node == 0) {
             root.childsm[code0] = new DHtreeNode(1, key, value);
             root.childs[code0] = io.write(root.childsm[code0]);
-            io.update(root, ObjectMap.getindex(root));
+            io.update(this, ObjectMap.getindex(this));
             return null;
         } else {
             DHtreeNode chid = io.read(node);
@@ -120,14 +120,14 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
             if (chid.hasV && chid.key.equals(key)) {
                 Object o = chid.values;
                 chid.values = value;
-                io.update(chid, ObjectMap.getindex(chid));
+                io.update(chid, node);
                 return o;
             }
             if (!chid.hasV) {
                 chid.hasV = true;
                 chid.key = key;
                 chid.values = value;
-                io.update(chid, ObjectMap.getindex(chid));
+                io.update(chid, node);
                 return null;
             } else {
                 return chid.putchild(key, value, hashcode);
@@ -142,17 +142,18 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
         }
         int hashcode = Math.abs(key.hashCode());
         int code0 = hashcode % root.code;
-        DHtreeNode node = root.childsm[code0];
-        if (node == null) {
+        int node = root.childs[code0];
+        if (node == 0) {
             return null;
         } else {
-            if (node.hasV && node.key.equals(key)) {
-                node.hasV = false;
-                return node.values;
+            DHtreeNode chid = io.read(node);
+            root.childsm[code0] = chid;
+            if (chid.hasV && chid.key.equals(key)) {
+                chid.hasV = false;
+                io.update(chid, node);
+                return chid.values;
             }
-
-            return node.removeChild(key, hashcode);
-
+            return chid.removeChild(key, hashcode);
 
         }
     }

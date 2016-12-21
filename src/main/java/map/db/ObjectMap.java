@@ -8,7 +8,7 @@ import java.util.Map;
  * 内存对象和磁盘index的map,用来更新磁盘对象
  */
 public class ObjectMap {
-    private static Map<Integer, Object> map = new HashMap<>();
+    public static Map<Integer, Object> map = new HashMap<>();
 
     public static void clear() {
         map.clear();
@@ -17,7 +17,7 @@ public class ObjectMap {
     public static int getindex(Object o) {
         for (Map.Entry<Integer, Object> entry :
                 map.entrySet()) {
-            if (entry.getValue().equals(o)) {
+            if (entry.getValue()==o) {
                 return entry.getKey();
             }
         }

@@ -7,6 +7,8 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import map.htree.MHashCodes;
 
+import java.util.Optional;
+
 /**
  * Created by jiang on 2016/12/19 0019.
  */
@@ -74,6 +76,9 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
         hasV = in.readBoolean();
         key = kryo.readObjectOrNull(in, String.class);
         values = kryo.readClassAndObject(in);
+        if (childs != null) {
+            childsm = new DHtreeNode[code];
+        }
     }
 
     public DHtreeNode() {
@@ -106,14 +111,14 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
             childsm = new DHtreeNode[code];
             childsm[mycode] = new DHtreeNode(high + 1, key, values);
             childs[mycode] = io.write(childsm[mycode]);
-//            map.updateobejct_to_dic(this);
+            io.update(this, ObjectMap.getindex(this));
             return null;
         }
         if (childs[mycode] == 0) {
             DHtreeNode o = new DHtreeNode(high + 1, key, values);
             childsm[mycode] = o;
             childs[mycode] = io.write(o);
-//            map.updateobejct_to_dic(this);
+            io.update(this, ObjectMap.getindex(this));
             return null;
         }
         DHtreeNode chindnode = (DHtreeNode) io.read(childs[mycode]);
@@ -121,14 +126,14 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
         if (chindnode.hasV && chindnode.key.equals(key)) {
             Object values1 = chindnode.values;
             chindnode.values = values;
-//            map.updateobejct_to_dic(chindnode);
+            io.update(chindnode, childs[mycode]);
             return values1;
         }
         if (!chindnode.hasV) {
             chindnode.key = key;
             chindnode.hasV = true;
             chindnode.values = values;
-//            map.updateobejct_to_dic(chindnode);
+          io.update(chindnode, childs[mycode]);
             return null;
         }
         return childsm[mycode].putchild(key, values, hashcode);
@@ -178,7 +183,7 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
         childsm[mycode] = chindnode;
         if (childsm[mycode].hasV && childsm[mycode].key.equals(key)) {
             childsm[mycode].hasV = false;
-//            map.updateobejct_to_dic(chindnode);
+            io.update(chindnode, childs[mycode]);
             return childsm[mycode].values;
         }
         return childsm[mycode].removeChild(key, hashcode);

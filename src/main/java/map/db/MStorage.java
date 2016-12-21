@@ -220,23 +220,7 @@ class MStorage {
         int offsetInFile = (int) ((Math.abs(pageNumber) % Pagesize.max_page_number) * Pagesize.page_size);
         MappedByteBuffer b = buffers.get(f);
         if (b.limit() <= offsetInFile) {
-
-            //remapping buffer for each newly added page would be slow,
-            //so allocate new size in chunks
-            int increment = Math.min(Pagesize.page_size * 1024, offsetInFile / 10);
-            increment -= increment % Pagesize.page_size;
-
-            long newFileSize = offsetInFile + Pagesize.page_size + increment;
-            newFileSize = Math.min(Pagesize.max_page_number * Pagesize.page_size, newFileSize);
-
-            //expand file size
-            f.position(newFileSize - 1);
-            f.write(ByteBuffer.allocate(1));
-            //unmap old buffer
-            unmapBuffer(b);
-            //remap buffer
-            b = f.map(FileChannel.MapMode.READ_WRITE, 0, newFileSize);
-            buffers.put(f, b);
+            b = addfilesize(f, offsetInFile, b);
         }
 
         //write into buffer
@@ -268,13 +252,16 @@ class MStorage {
         if (b == null) { //not mapped yet
             b = f.map(FileChannel.MapMode.READ_WRITE, 0, f.size());
         }
-
-        //check buffers size
+        //增加文件大小，64m为单位
         if (b.limit() <= offsetInFile) {
-            //file is smaller, return empty data
-            return ByteBuffer.wrap(CLEAN_DATA).asReadOnlyBuffer();
+            b = addfilesize(f, offsetInFile, b);
         }
-
+//        //check buffers size
+//        if (b.limit() <= offsetInFile) {
+//            //file is smaller, return empty data
+////            return ByteBuffer.wrap(CLEAN_DATA).asReadOnlyBuffer();
+//            return ByteBuffer.wrap(CLEAN_DATA);
+//        }
         b.position(offsetInFile);
         ByteBuffer ret = b.slice();
         ret.limit(Pagesize.page_size);
@@ -284,6 +271,33 @@ class MStorage {
             ret = ret.asReadOnlyBuffer();
         }
         return ret;
+    }
+
+    /**
+     * Addfilesize mapped byte buffer.
+     *
+     * @param f            the f
+     * @param offsetInFile the offset in file
+     * @param b            the b
+     * @return the mapped byte buffer 新的buff
+     * @throws IOException the io exception
+     */
+    public MappedByteBuffer addfilesize(FileChannel f, int offsetInFile, MappedByteBuffer b) throws IOException {
+        long newFileSize = b.limit() + Pagesize.page_size*1024*16l;
+        newFileSize = Math.min(Pagesize.Max_file_size, newFileSize);
+        int oledsize = b.limit();
+        //unmap old buffer
+        unmapBuffer(b);
+        //remap buffer
+        b = f.map(FileChannel.MapMode.READ_WRITE, 0, newFileSize);
+        //expand file size
+        b.position(offsetInFile);
+        for (int i = 0; i < 1024 * 16; i++) {
+            b.put(CLEAN_DATA);
+        }
+        b.force();
+        buffers.put(f, b);
+        return b;
     }
 
     /**

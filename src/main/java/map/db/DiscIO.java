@@ -32,6 +32,7 @@ public class DiscIO implements MdiscIO {
         this(MStorage.getInstance(filename));
         this.filename = filename;
     }
+
     String filename;
 
     MStorage storage;
@@ -52,14 +53,16 @@ public class DiscIO implements MdiscIO {
     public int write(Object o) {
         byte[] bytes = ObjectSeriaer.getbytes(o);
         int[] pages = pagemanager.getfreepanages(bytes.length);
-        System.out.println("页面地址：" + pages[0] + "   大小：" + bytes.length);
+        System.out.println("写页面地址：" + pages[0] + "   大小：" + bytes.length);
         if (pages.length == 1) {
             try {
                 ByteBuffer buffer = storage.read(pages[0]);
                 if (o instanceof DHtree)
                     buffer.putShort(Pagesize.pagehead_tree);
-                else {
+                else if (o instanceof DHtreeNode) {
                     buffer.putShort(Pagesize.pagehead_node);
+                } else  {
+                    buffer.putShort(Pagesize.pagehead_other);
                 }
                 buffer.putInt(bytes.length);
                 buffer.put(bytes);
@@ -77,29 +80,29 @@ public class DiscIO implements MdiscIO {
 
     @Override
     public int update(Object o, int recid) {
+        if (!ObjectMap.map.containsKey(recid)) {
+            return recid;
+        }
         byte[] bytes = ObjectSeriaer.getbytes(o);
-        int[] pages = pagemanager.getfreepanages(bytes.length);
-        System.out.println("页面地址：" + pages[0] + "   大小：" + bytes.length);
-        if (pages.length == 1) {
+//        System.out.println("更新页面地址：" + recid + "   大小：" + bytes.length);
             try {
-                ByteBuffer buffer = storage.read(pages[0]);
+                ByteBuffer buffer = storage.read(recid);
                 if (o instanceof DHtree)
                     buffer.putShort(Pagesize.pagehead_tree);
-                else {
+                else if (o instanceof DHtreeNode) {
                     buffer.putShort(Pagesize.pagehead_node);
+                } else  {
+                    buffer.putShort(Pagesize.pagehead_other);
                 }
                 buffer.putInt(bytes.length);
                 buffer.put(bytes);
-                storage.write(pages[0], buffer);
-                ObjectMap.putorupdate(o, pages[0]);
-                return pages[0];
+                storage.write(recid, buffer);
+                ObjectMap.putorupdate(o, recid);
+                return recid;
             } catch (IOException e) {
                 e.printStackTrace();
+                return -1;
             }
-        } else {
-            //
-        }
-        return recid;
     }
 
     @Override
@@ -108,7 +111,8 @@ public class DiscIO implements MdiscIO {
             ByteBuffer buffer = storage.read(id);
             short type = buffer.getShort();
             int size = buffer.getInt();
-            byte[] buff = new byte[buffer.remaining()];
+//            System.out.println("得到页面地址：" + id + "   大小：" + size);
+            byte[] buff = new byte[size];
             buffer.get(buff);
             T object = ObjectSeriaer.getObject(buff);
             ObjectMap.putorupdate(object, id);

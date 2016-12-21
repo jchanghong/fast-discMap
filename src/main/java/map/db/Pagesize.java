@@ -11,5 +11,5 @@ public interface Pagesize {
     int headsize_in_byte = max_page_number / 8;//需要多少个字节存bit map
     short pagehead_tree = 1;
     short pagehead_node = 2;
-    short pagehead_root = 2;
+    short pagehead_other = 2;
 }
