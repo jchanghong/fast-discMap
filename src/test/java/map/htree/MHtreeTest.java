@@ -1,9 +1,19 @@
+/*
+ *
+ *
+ *    Created on  16-12-21 下午9:49 by jiang
+ *    very fast key value store 简单，快速的键值储存。
+ *    特别为小文件储存设计，比如图片文件。
+ *    把小文件存数据库中不是理想的选择。存在文件系统中又有太多小文件难管理
+ *
+ */
+
 package map.htree;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by jiang on 2016/12/19 0019.
@@ -11,6 +21,7 @@ import static org.junit.Assert.*;
 @SuppressWarnings("Duplicates")
 public class MHtreeTest {
     MHtree mHtree = new MHtree();
+
     @Before
     public void setUp() throws Exception {
         mHtree = new MHtree();
@@ -100,12 +111,12 @@ public class MHtreeTest {
         htree.put("BBBB", "222");
         htree.put("AaBB", "333");
         htree.put("BBAa", "444");
-        assertEquals("111",htree.get("AaAa"));
-        assertEquals("222",htree.get("BBBB"));
-        assertEquals("333",htree.get("AaBB"));
-        assertEquals("444",htree.get("BBAa"));
+        assertEquals("111", htree.get("AaAa"));
+        assertEquals("222", htree.get("BBBB"));
+        assertEquals("333", htree.get("AaBB"));
+        assertEquals("444", htree.get("BBAa"));
         htree.remove("BBAa");
-        assertEquals(null,htree.get("BBAa"));
+        assertEquals(null, htree.get("BBAa"));
     }
 
     @Test
@@ -125,11 +136,12 @@ public class MHtreeTest {
         }
         System.out.println(htree.size());
     }
+
     @Test
     public void test12() {
-        System.out.println("A:" + ((int)'A'));
-        System.out.println("B:" + ((int)'B'));
-        System.out.println("a:" + ((int)'a'));
+        System.out.println("A:" + ((int) 'A'));
+        System.out.println("B:" + ((int) 'B'));
+        System.out.println("a:" + ((int) 'a'));
 
         System.out.println(hash("Aa".hashCode()));
         System.out.println(hash("BB".hashCode()));
@@ -144,7 +156,7 @@ public class MHtreeTest {
     }
 
     private String hash(int i) {
-        return i+"";
+        return i + "";
     }
 
 }

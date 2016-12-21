@@ -1,3 +1,13 @@
+/*
+ *
+ *
+ *    Created on  16-12-21 下午9:49 by jiang
+ *    very fast key value store 简单，快速的键值储存。
+ *    特别为小文件储存设计，比如图片文件。
+ *    把小文件存数据库中不是理想的选择。存在文件系统中又有太多小文件难管理
+ *
+ */
+
 package map.demo;
 
 import java.util.HashMap;
@@ -11,6 +21,14 @@ public class TestHashcode {
      * The Hash number.
      */
     static Map<Integer, Integer> hash_number = new HashMap<>();
+    /**
+     * The Chars.
+     */
+    static char[] chars = {'a', 'z', 'c', 'd', 'e', 'f', 'g', 'h', 'q', 'e', 'r', 't', 'u', 'i', 'k', 'm'};
+    /**
+     * The Num.
+     */
+    static int num = chars.length;
 
     /**
      * Gets .
@@ -22,8 +40,7 @@ public class TestHashcode {
         int hashindex = (Math.abs(key.hashCode())) % 997 + 3;
         if (hash_number.containsKey(hashindex)) {
             hash_number.put(hashindex, hash_number.get(hashindex) + 1);
-        }
-        else {
+        } else {
             hash_number.put(hashindex, 1);
         }
         return hashindex;
@@ -64,16 +81,8 @@ public class TestHashcode {
             getcode(randstring());
         }
         System.out.println(hash_number.keySet().size());//不突然的数量
-        System.out.println(hash_number.values().stream().mapToInt(a->a).max().getAsInt());//最长的数
+        //noinspection OptionalGetWithoutIsPresent
+        System.out.println(hash_number.values().stream().mapToInt(a -> a).max().getAsInt());//最长的数
 
     }
-
-    /**
-     * The Chars.
-     */
-    static char[] chars = {'a', 'z', 'c', 'd', 'e', 'f', 'g', 'h', 'q', 'e', 'r', 't', 'u', 'i', 'k', 'm'};
-    /**
-     * The Num.
-     */
-    static int num = chars.length;
 }

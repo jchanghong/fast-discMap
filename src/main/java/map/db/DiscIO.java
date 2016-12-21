@@ -1,3 +1,13 @@
+/*
+ *
+ *
+ *    Created on  16-12-21 下午9:49 by jiang
+ *    very fast key value store 简单，快速的键值储存。
+ *    特别为小文件储存设计，比如图片文件。
+ *    把小文件存数据库中不是理想的选择。存在文件系统中又有太多小文件难管理
+ *
+ */
+
 package map.db;
 
 import java.io.IOException;
@@ -12,6 +22,60 @@ import java.nio.ByteBuffer;
 @SuppressWarnings("ControlFlowStatementWithoutBraces")
 public class DiscIO implements MdiscIO {
     private static DiscIO instn = null;
+    /**
+     * The Filename.
+     */
+    String filename;
+    /**
+     * The Storage.
+     */
+    MStorage storage;
+    /**
+     * The Pagemanager.
+     */
+    Pagemanager pagemanager;
+
+    private DiscIO(String filename) {
+        this(MStorage.getInstance(filename));
+        this.filename = filename;
+    }
+
+    private DiscIO(MStorage storage) {
+        this.storage = storage;
+        pagemanager = new Pagemanager(storage);
+    }
+
+    /**
+     * Gets instance.
+     *
+     * @param filename the filename
+     * @return the instance
+     */
+    public static DiscIO getInstance(String filename) {
+        if (instn == null) {
+            instn = new DiscIO(filename);
+        }
+        return instn;
+    }
+
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws IOException the io exception
+     */
+    public static void main(String[] args) throws IOException {
+        DiscIO discIO = DiscIO.getInstance("d");
+        DHtreeNode node = new DHtreeNode(1, "d", "dd66666666666666666666666666666666666666666");
+        int i = discIO.write(node);
+        System.out.println(i);
+        node = discIO.read(i);
+        System.out.println(node.values);
+        node.values = "Faaaa";
+        discIO.update(node, i);
+        node = discIO.read(i);
+        System.out.println(node.values);
+    }
 
     /**
      * Gets storage.
@@ -32,43 +96,6 @@ public class DiscIO implements MdiscIO {
     }
 
     /**
-     * Gets instance.
-     *
-     * @param filename the filename
-     * @return the instance
-     */
-    public static DiscIO getInstance(String filename) {
-        if (instn == null) {
-            instn = new DiscIO(filename);
-        }
-        return instn;
-    }
-
-    private DiscIO(String filename) {
-        this(MStorage.getInstance(filename));
-        this.filename = filename;
-    }
-
-    /**
-     * The Filename.
-     */
-    String filename;
-
-    /**
-     * The Storage.
-     */
-    MStorage storage;
-    /**
-     * The Pagemanager.
-     */
-    Pagemanager pagemanager;
-
-    private DiscIO(MStorage storage) {
-        this.storage = storage;
-        pagemanager = new Pagemanager(storage);
-    }
-
-    /**
      * Write int.
      *
      * @param o the o
@@ -86,7 +113,7 @@ public class DiscIO implements MdiscIO {
                     buffer.putShort(Pagesize.pagehead_tree);
                 else if (o instanceof DHtreeNode) {
                     buffer.putShort(Pagesize.pagehead_node);
-                } else  {
+                } else {
                     buffer.putShort(Pagesize.pagehead_other);
                 }
                 buffer.putInt(bytes.length);
@@ -110,24 +137,24 @@ public class DiscIO implements MdiscIO {
         }
         byte[] bytes = ObjectSeriaer.getbytes(o);
 //        System.out.println("更新页面地址：" + recid + "   大小：" + bytes.length);
-            try {
-                ByteBuffer buffer = storage.read(recid);
-                if (o instanceof DHtree)
-                    buffer.putShort(Pagesize.pagehead_tree);
-                else if (o instanceof DHtreeNode) {
-                    buffer.putShort(Pagesize.pagehead_node);
-                } else  {
-                    buffer.putShort(Pagesize.pagehead_other);
-                }
-                buffer.putInt(bytes.length);
-                buffer.put(bytes);
-                storage.write(recid, buffer);
-                ObjectMap.putorupdate(o, recid);
-                return recid;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return -1;
+        try {
+            ByteBuffer buffer = storage.read(recid);
+            if (o instanceof DHtree)
+                buffer.putShort(Pagesize.pagehead_tree);
+            else if (o instanceof DHtreeNode) {
+                buffer.putShort(Pagesize.pagehead_node);
+            } else {
+                buffer.putShort(Pagesize.pagehead_other);
             }
+            buffer.putInt(bytes.length);
+            buffer.put(bytes);
+            storage.write(recid, buffer);
+            ObjectMap.putorupdate(o, recid);
+            return recid;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     @Override
@@ -146,24 +173,5 @@ public class DiscIO implements MdiscIO {
             e.printStackTrace();
         }
         return null;
-    }
-
-    /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     * @throws IOException the io exception
-     */
-    public static void main(String[] args) throws IOException {
-        DiscIO discIO = DiscIO.getInstance("d");
-        DHtreeNode node = new DHtreeNode(1, "d", "dd66666666666666666666666666666666666666666");
-        int i = discIO.write(node);
-        System.out.println(i);
-        node = discIO.read(i);
-        System.out.println(node.values);
-        node.values = "Faaaa";
-        discIO.update(node, i);
-        node = discIO.read(i);
-        System.out.println(node.values);
     }
 }

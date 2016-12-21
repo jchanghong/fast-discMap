@@ -1,3 +1,13 @@
+/*
+ *
+ *
+ *    Created on  16-12-21 下午9:49 by jiang
+ *    very fast key value store 简单，快速的键值储存。
+ *    特别为小文件储存设计，比如图片文件。
+ *    把小文件存数据库中不是理想的选择。存在文件系统中又有太多小文件难管理
+ *
+ */
+
 package map.db;
 
 
@@ -6,8 +16,7 @@ import com.esotericsoftware.kryo.KryoSerializable;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import map.htree.MHashCodes;
-
-import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by jiang on 2016/12/19 0019.
@@ -41,11 +50,35 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
      * The Values.
      */
     public Object values;
-    private MdiscIO io;
     /**
      * The Map.
      */
     ObjectMap map;
+    private MdiscIO io;
+
+    /**
+     * Instantiates a new D htree node.
+     */
+    public DHtreeNode() {
+        this(0, null, null);
+    }
+
+    /**
+     * Instantiates a new D htree node.
+     *
+     * @param high   the high
+     * @param key    the key
+     * @param values the values
+     */
+    public DHtreeNode(int high, String key, Object values) {
+        this.high = high;
+        code = MHashCodes.codes[high];
+        this.key = key;
+        this.values = values;
+        hasV = !(key == null || high == 0);
+        io = DiscIO.getInstance("d");
+//        map = ObjectMap.getInstance();
+    }
 
     @Override
     public String toString() {
@@ -87,7 +120,7 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
             if (key != null) {
                 return key.equals(node.key);
             }
-            return node.key.equals(key);
+            return node.key.equals(null);
         }
         return super.equals(obj);
     }
@@ -103,30 +136,6 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
         if (childs != null) {
             childsm = new DHtreeNode[code];
         }
-    }
-
-    /**
-     * Instantiates a new D htree node.
-     */
-    public DHtreeNode() {
-        this(0, null, null);
-    }
-
-    /**
-     * Instantiates a new D htree node.
-     *
-     * @param high   the high
-     * @param key    the key
-     * @param values the values
-     */
-    public DHtreeNode(int high, String key, Object values) {
-        this.high = high;
-        code = MHashCodes.codes[high];
-        this.key = key;
-        this.values = values;
-        hasV = key == null || high == 0 ? false : true;
-        io = DiscIO.getInstance("d");
-//        map = ObjectMap.getInstance();
     }
 
     /**
@@ -167,7 +176,7 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
             chindnode.key = key;
             chindnode.hasV = true;
             chindnode.values = values;
-          io.update(chindnode, childs[mycode]);
+            io.update(chindnode, childs[mycode]);
             return null;
         }
         return childsm[mycode].putchild(key, values, hashcode);
@@ -224,15 +233,13 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
     }
 
     @Override
-    public int compareTo(DHtreeNode o) {
+    public int compareTo(@NotNull DHtreeNode o) {
         int i = high - o.high;
         if (i != 0) {
             return i;
         }
-        if (o == null) {
-            return 1;
-        }
         if (key == null) {
+            assert key != null;
             return o.key == null ? 0 : o.key.compareTo(key);
         }
         return key.compareTo(o.key);

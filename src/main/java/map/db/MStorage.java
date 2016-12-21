@@ -1,3 +1,13 @@
+/*
+ *
+ *
+ *    Created on  16-12-21 下午9:49 by jiang
+ *    very fast key value store 简单，快速的键值储存。
+ *    特别为小文件储存设计，比如图片文件。
+ *    把小文件存数据库中不是理想的选择。存在文件系统中又有太多小文件难管理
+ *
+ */
+
 package map.db;
 
 import map.util.BitArray;
@@ -17,60 +27,6 @@ import java.util.List;
  * 文件前面2m保留做头信息1024*1024*2/4096=512页面
  */
 class MStorage {
-    private static MStorage int1;
-
-    /**
-     * Gets instance.
-     *
-     * @param filename the filename
-     * @return the instance
-     */
-    public static MStorage getInstance(String filename) {
-        if (int1 == null) {
-            int1 = new MStorage(filename);
-        }
-        return int1;
-    }
-
-    /**
-     * The constant bitArray.
-     */
-    public static BitArray bitArray;
-
-    private MStorage(String fileName) {
-        this.fileName = fileName;
-        this.transactionsDisabled = true;
-        this.readonly = false;
-        this.lockingDisabled = false;
-        //make sure first file can be opened
-        //lock it
-        try {
-            if (!lockingDisabled)
-                getChannel(0).lock();
-        } catch (IOException e) {
-            throw new NullPointerException("Could not lock DB file: " + fileName);
-        } catch (OverlappingFileLockException e) {
-            throw new NullPointerException("Could not lock DB file: " + fileName);
-        }
-    }
-
-    /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     * @throws IOException the io exception
-     */
-    public static void main(String[] args) throws IOException {
-        MStorage storage = MStorage.getInstance("d");
-//        for (int i = 0; i < 512; i++) {
-//            bitArray.set(i, true);
-//        }
-//        bitArray.set(510, false);
-        System.out.println(bitArray.get(520));
-        System.out.println(bitArray.get(511));
-        System.out.println(bitArray.get(510));
-    }
-
     /**
      * The Transaction log file extension.
      */
@@ -79,13 +35,6 @@ class MStorage {
      * The Clean data.
      */
     static final byte[] CLEAN_DATA = new byte[Pagesize.page_size];
-//    static final byte[] all_zear_bytes = new byte[Pagesize.page_size];
-//    static {
-//        for (int i = 0; i < Pagesize.page_size; i++) {
-//            all_zear_bytes[i] = 0;
-//        }
-//    }
-
     /**
      * use 'val & OFFSET_MASK' to quickly get offset within the page;
      */
@@ -94,25 +43,50 @@ class MStorage {
      * The Idr.
      */
     static final String IDR = ".i";
-
     /**
      * The Dbr.
      */
     static final String DBR = ".d";
-
-    private ArrayList<FileChannel> channels = new ArrayList<FileChannel>();
-    private ArrayList<FileChannel> channelsTranslation = new ArrayList<FileChannel>();
-    private IdentityHashMap<FileChannel, MappedByteBuffer> buffers = new IdentityHashMap<FileChannel, MappedByteBuffer>();
+    /**
+     * The constant bitArray.
+     */
+    public static BitArray bitArray;
+    /**
+     * The constant init.
+     */
+    public static boolean init;
+//    static final byte[] all_zear_bytes = new byte[Pagesize.page_size];
+//    static {
+//        for (int i = 0; i < Pagesize.page_size; i++) {
+//            all_zear_bytes[i] = 0;
+//        }
+//    }
+    private static MStorage int1;
     /**
      * The Headbuff.
      */
 /*head=128kb,32页面*/
     public MappedByteBuffer headbuff;
+    private ArrayList<FileChannel> channels = new ArrayList<FileChannel>();
+    private ArrayList<FileChannel> channelsTranslation = new ArrayList<FileChannel>();
+    private IdentityHashMap<FileChannel, MappedByteBuffer> buffers = new IdentityHashMap<FileChannel, MappedByteBuffer>();
     private String fileName;
     private boolean transactionsDisabled;
     private boolean readonly;
     private boolean lockingDisabled;
-
+    private MStorage(String fileName) {
+        this.fileName = fileName;
+        this.transactionsDisabled = true;
+        this.readonly = false;
+        this.lockingDisabled = false;
+        //make sure first file can be opened
+        //lock it
+        try {
+            getChannel(0).lock();
+        } catch (IOException | OverlappingFileLockException e) {
+            throw new NullPointerException("Could not lock DB file: " + fileName);
+        }
+    }
     /**
      * Instantiates a new M storage.
      *
@@ -133,18 +107,76 @@ class MStorage {
             if (!lockingDisabled)
                 getChannel(0).lock();
 
-        } catch (IOException e) {
-            throw new IOException("Could not lock DB file: " + fileName, e);
-        } catch (OverlappingFileLockException e) {
+        } catch (IOException | OverlappingFileLockException e) {
             throw new IOException("Could not lock DB file: " + fileName, e);
         }
 
     }
 
     /**
-     * The constant init.
+     * Gets instance.
+     *
+     * @param filename the filename
+     * @return the instance
      */
-    public static boolean init;
+    public static MStorage getInstance(String filename) {
+        if (int1 == null) {
+            int1 = new MStorage(filename);
+        }
+        return int1;
+    }
+
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws IOException the io exception
+     */
+    public static void main(String[] args) throws IOException {
+        MStorage storage = MStorage.getInstance("d");
+//        for (int i = 0; i < 512; i++) {
+//            bitArray.set(i, true);
+//        }
+//        bitArray.set(510, false);
+        System.out.println(bitArray.get(520));
+        System.out.println(bitArray.get(511));
+        System.out.println(bitArray.get(510));
+    }
+
+    /**
+     * Make file name string.
+     *
+     * @param fileName   the file name
+     * @param pageNumber the page number
+     * @param fileNumber the file number
+     * @return the string
+     */
+    static String makeFileName(String fileName, long pageNumber, int fileNumber) {
+        return fileName + (pageNumber >= 0 ? DBR : IDR) + "." + fileNumber;
+//        return "E:\\迅雷下载\\ideaIU-2016.3.exe";
+    }
+
+    /**
+     * Delete files.
+     *
+     * @param fileName the file name
+     */
+    static void deleteFiles(String fileName) {
+        for (int i = 0; true; i++) {
+            String name = makeFileName(fileName, +1, i);
+            File f = new File(name);
+            boolean exists = f.exists();
+            if (exists && !f.delete()) f.deleteOnExit();
+            if (!exists) break;
+        }
+        for (int i = 0; true; i++) {
+            String name = makeFileName(fileName, -1, i);
+            File f = new File(name);
+            boolean exists = f.exists();
+            if (exists && !f.delete()) f.deleteOnExit();
+            if (!exists) break;
+        }
+    }
 
     private FileChannel getChannel(long pageNumber) throws IOException {
         int fileNumber = (int) (Math.abs(pageNumber) / Pagesize.max_page_number);
@@ -201,20 +233,6 @@ class MStorage {
 
         }
     }
-
-    /**
-     * Make file name string.
-     *
-     * @param fileName   the file name
-     * @param pageNumber the page number
-     * @param fileNumber the file number
-     * @return the string
-     */
-    static String makeFileName(String fileName, long pageNumber, int fileNumber) {
-        return fileName + (pageNumber >= 0 ? DBR : IDR) + "." + fileNumber;
-//        return "E:\\迅雷下载\\ideaIU-2016.3.exe";
-    }
-
 
     /**
      * Write.
@@ -298,8 +316,8 @@ class MStorage {
      * @throws IOException the io exception
      */
     public MappedByteBuffer addfilesize(FileChannel f, int offsetInFile, MappedByteBuffer b) throws IOException {
-        long newFileSize = b.limit() + Pagesize.page_size*1024*16l;
-        newFileSize = Math.min(Pagesize.Max_file_size, newFileSize);
+        long newFileSize = b.limit() + Pagesize.page_size * 1024 * 16L;
+        newFileSize = Math.min(newFileSize, Pagesize.Max_file_size);
         int oledsize = b.limit();
         //unmap old buffer
         unmapBuffer(b);
@@ -348,7 +366,6 @@ class MStorage {
         }
     }
 
-
     /**
      * Open transaction log data output stream.
      *
@@ -379,29 +396,6 @@ class MStorage {
         deleteTransactionLog();
         deleteFiles(fileName);
     }
-
-    /**
-     * Delete files.
-     *
-     * @param fileName the file name
-     */
-    static void deleteFiles(String fileName) {
-        for (int i = 0; true; i++) {
-            String name = makeFileName(fileName, +1, i);
-            File f = new File(name);
-            boolean exists = f.exists();
-            if (exists && !f.delete()) f.deleteOnExit();
-            if (!exists) break;
-        }
-        for (int i = 0; true; i++) {
-            String name = makeFileName(fileName, -1, i);
-            File f = new File(name);
-            boolean exists = f.exists();
-            if (exists && !f.delete()) f.deleteOnExit();
-            if (!exists) break;
-        }
-    }
-
 
     /**
      * Read transaction log data input stream.

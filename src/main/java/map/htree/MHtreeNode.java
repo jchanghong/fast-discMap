@@ -1,11 +1,26 @@
+/*
+ *
+ *
+ *    Created on  16-12-21 下午9:49 by jiang
+ *    very fast key value store 简单，快速的键值储存。
+ *    特别为小文件储存设计，比如图片文件。
+ *    把小文件存数据库中不是理想的选择。存在文件系统中又有太多小文件难管理
+ *
+ */
+
 package map.htree;
 
-import java.io.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 /**
  * Created by jiang on 2016/12/19 0019.
  */
-public class MHtreeNode implements Comparable<MHtreeNode> ,Externalizable{
+public class MHtreeNode implements Comparable<MHtreeNode>, Externalizable {
 
     /**
      * The High.
@@ -38,34 +53,6 @@ public class MHtreeNode implements Comparable<MHtreeNode> ,Externalizable{
     public MHtreeNode() {
     }
 
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        out.write(high);
-        out.writeObject(childs);
-        out.writeBoolean(hasV);
-        out.writeObject(key);
-        out.writeObject(values);
-    }
-
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-
-      this.high = in.read();
-        this.code = MHashCodes.codes[high];
-        childs = (MHtreeNode[]) in.readObject();
-        hasV = in.readBoolean();
-        try {
-            key = (String) in.readObject();
-        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-            key = null;
-        } catch (IOException e) {
-//            e.printStackTrace();
-            key = null;
-        }
-        values = in.readObject();
-    }
-
     /**
      * Instantiates a new M htree node.
      *
@@ -78,7 +65,32 @@ public class MHtreeNode implements Comparable<MHtreeNode> ,Externalizable{
         code = MHashCodes.codes[high];
         this.key = key;
         this.values = values;
-        hasV = key == null || high == 0 ? false : true;
+        hasV = !(key == null || high == 0);
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.write(high);
+        out.writeObject(childs);
+        out.writeBoolean(hasV);
+        out.writeObject(key);
+        out.writeObject(values);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+
+        this.high = in.read();
+        this.code = MHashCodes.codes[high];
+        childs = (MHtreeNode[]) in.readObject();
+        hasV = in.readBoolean();
+        try {
+            key = (String) in.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+//            e.printStackTrace();
+            key = null;
+        }
+        values = in.readObject();
     }
 
     /**
@@ -163,7 +175,7 @@ public class MHtreeNode implements Comparable<MHtreeNode> ,Externalizable{
     }
 
     @Override
-    public int compareTo(MHtreeNode o) {
+    public int compareTo(@NotNull MHtreeNode o) {
         if (key == null) {
             return o == null ? 0 : o.compareTo(this);
         }

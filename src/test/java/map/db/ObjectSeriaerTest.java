@@ -1,3 +1,13 @@
+/*
+ *
+ *
+ *    Created on  16-12-21 下午9:49 by jiang
+ *    very fast key value store 简单，快速的键值储存。
+ *    特别为小文件储存设计，比如图片文件。
+ *    把小文件存数据库中不是理想的选择。存在文件系统中又有太多小文件难管理
+ *
+ */
+
 package map.db;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -8,14 +18,17 @@ import org.junit.Test;
 
 import java.util.BitSet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by jiang on 2016/12/20 0020.
  */
 public class ObjectSeriaerTest {
-    static       Kryo kryo = new Kryo();
-
+    static Kryo kryo = new Kryo();
+    static byte[] bytes = new byte[1024 * 17];
+    //    public byte[] bytes = new byte[1024 * 1024];
+    public DHtreeNode dHtreeNode = new DHtreeNode(1, "dfffff", "ggg");
+    Output output = new Output(bytes);
 
     @Test
     public void TESTJAVA() throws Exception {
@@ -29,8 +42,6 @@ public class ObjectSeriaerTest {
         }
     }
 
-    static byte[] bytes = new byte[1024 * 17];
-    Output output = new Output(bytes);
     @Test
     public void testkryo() throws Exception {
         for (int i = 0; i < 20; i++) {
@@ -75,14 +86,12 @@ public class ObjectSeriaerTest {
         }
     }
 
-//    public byte[] bytes = new byte[1024 * 1024];
-    public DHtreeNode dHtreeNode = new DHtreeNode(1, "dfffff", "ggg");
     @Before
     public void setUp() throws Exception {
 //        dHtreeNode.childs = new DHtreeNode[dHtreeNode.code];
 //        kryo.setReferences(false);
 //        kryo.register(BitSet.class, 9);
-       System.out.println(kryo.getSerializer(int[].class));
+        System.out.println(kryo.getSerializer(int[].class));
 
 
     }
@@ -107,7 +116,7 @@ public class ObjectSeriaerTest {
     public void test111() throws Exception {
 
         for (int i = 0; i < 2; i++) {
-            BitSet bitSet = new BitSet(Pagesize.max_page_number*10);
+            BitSet bitSet = new BitSet(Pagesize.max_page_number * 10);
             int size = bitSet.size();
             byte[] getbytes = ObjectSeriaer.getbytes(bitSet);
             System.out.println(getbytes.length);

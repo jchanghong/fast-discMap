@@ -1,3 +1,13 @@
+/*
+ *
+ *
+ *    Created on  16-12-21 下午9:49 by jiang
+ *    very fast key value store 简单，快速的键值储存。
+ *    特别为小文件储存设计，比如图片文件。
+ *    把小文件存数据库中不是理想的选择。存在文件系统中又有太多小文件难管理
+ *
+ */
+
 package map.db;
 
 import java.nio.MappedByteBuffer;
@@ -7,9 +17,68 @@ import java.util.Map;
 /**
  * Created by jiang on 2016/12/21 0021.
  */
+@SuppressWarnings("ALL")
 public class DB {
+    private static DB db;
+    /**
+     * The Headbuff.
+     */
+    MappedByteBuffer headbuff;
+    /**
+     * The Disc io.
+     */
+    DiscIO discIO;
+    /**
+     * The Map map.
+     */
+    Map<String, Integer> map_map;
+    private DB(String filename) {
+        discIO = DiscIO.getInstance(filename);
+        headbuff = discIO.getStorage().headbuff;
+        ObjectSeriaer.kryo.register(DHtree.class, 23);
+        ObjectSeriaer.kryo.register(DHtreeNode.class, 22);
+        if (MStorage.init) {
+            updatemap();
+        }
+        setMap_map();
+    }
+
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
+    public static void main(String[] args) {
+        db = DB.getInstance("d");
+        db.createorGetmap("map4");
+        db.createorGetmap("map5");
+//        Map<String,Object> htree = db.createorGetmap("map1");
+        DHtree dHtree = (DHtree) db.getmap("map4");
+        System.out.println(dHtree.name);
+        dHtree = (DHtree) db.getmap("map5");
+        System.out.println(dHtree.name);
+
+        db.createorGetmap("mymap");
+        dHtree = (DHtree) db.getmap("mymap");
+        System.out.println(dHtree.root);
+
+    }
+
+    /**
+     * Gets instance.
+     *
+     * @param filename the filename
+     * @return the instance
+     */
+    public static DB getInstance(String filename) {
+        if (db == null) {
+            db = new DB(filename);
+        }
+        return db;
+    }
+
     private void updatemap() {
-        if (map_map==null) {
+        if (map_map == null) {
             map_map = new HashMap<>();
         }
         headbuff.position(128 * 1024);
@@ -27,71 +96,12 @@ public class DB {
     }
 
     /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     */
-    public static void main(String[] args) {
-        db = DB.getInstance("d");
-        db.createorGetmap("map4");
-        db.createorGetmap("map5");
-//        Map<String,Object> htree = db.createorGetmap("map1");
-        DHtree dHtree = (DHtree) db.getmap("map4");
-        System.out.println(dHtree.name);
-         dHtree = (DHtree) db.getmap("map5");
-        System.out.println(dHtree.name);
-
-        db.createorGetmap("mymap");
-        dHtree = (DHtree) db.getmap("mymap");
-        System.out.println(dHtree.root);
-
-    }
-
-    /**
-     * The Headbuff.
-     */
-    MappedByteBuffer headbuff;
-    private static DB db;
-    /**
-     * The Disc io.
-     */
-    DiscIO discIO;
-    /**
-     * The Map map.
-     */
-    Map<String, Integer> map_map;
-
-    private DB(String filename) {
-        discIO = DiscIO.getInstance(filename);
-        headbuff = discIO.getStorage().headbuff;
-        ObjectSeriaer.kryo.register(DHtree.class, 23);
-        ObjectSeriaer.kryo.register(DHtreeNode.class, 22);
-        if (MStorage.init) {
-            updatemap();
-        }
-        setMap_map();
-    }
-
-    /**
-     * Gets instance.
-     *
-     * @param filename the filename
-     * @return the instance
-     */
-    public static DB getInstance(String filename) {
-        if (db == null) {
-            db = new DB(filename);
-        }
-        return db;
-    }
-
-    /**
      * Gets .name必须存在
      *
      * @param mapname the mapname
      * @return the
      */
-    public  Map<String, Object> getmap(String mapname) {
+    public Map<String, Object> getmap(String mapname) {
         int index = map_map.get(mapname);
         return discIO.read(index);
     }
@@ -102,7 +112,7 @@ public class DB {
      * @param mapname the mapname
      * @return the map
      */
-    public  Map<String, Object> createorGetmap(String mapname) {
+    public Map<String, Object> createorGetmap(String mapname) {
         if (map_map.containsKey(mapname)) {
             return getmap(mapname);
         }
