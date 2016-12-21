@@ -17,6 +17,11 @@ import java.util.List;
  * 文件前面2m保留做头信息1024*1024*2/4096=512页面
  */
 class MStorage {
+    private static MStorage int1 = new MStorage("d");
+
+    public static MStorage getInstance() {
+        return int1;
+    }
     public static BitArray bitArray;
     public MStorage(String fileName)  {
         this.fileName = fileName;
@@ -42,12 +47,12 @@ class MStorage {
      * @throws IOException the io exception
      */
     public static void main(String[] args) throws IOException {
-        MStorage storage = new MStorage("d");
+        MStorage storage = MStorage.getInstance();
 //        for (int i = 0; i < 512; i++) {
 //            bitArray.set(i, true);
 //        }
 //        bitArray.set(510, false);
-        System.out.println(bitArray.get(512));
+        System.out.println(bitArray.get(520));
         System.out.println(bitArray.get(511));
         System.out.println(bitArray.get(510));
     }

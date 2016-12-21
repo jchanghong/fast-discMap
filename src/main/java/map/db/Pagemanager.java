@@ -22,20 +22,20 @@ public class Pagemanager {
         int sum = (recsize-1) / Pagesize.page_size + 1;
         int[] ints = new int[sum];
         int index = 0;
-        for (int i = 33; i < Pagesize.max_page_number; i++) {
-//            if (!MStorage.bitSet.get(i + 1)) {
-//                ints[index++] = i;
-//                MStorage.bitSet.set(i+1,true);
-//                if (index >= sum) {
-//                    break;
-//                }
-//            }
+        for (int i = 512; i < Pagesize.max_page_number; i++) {
+            if (!MStorage.bitArray.get(i + 1)) {
+                ints[index++] = i;
+                MStorage.bitArray.set(i,true);
+                if (index >= sum) {
+                    break;
+                }
+            }
         }
         return ints;
     }
     public static void main(String[] args) throws IOException {
-        Pagemanager pagemanager = new Pagemanager(new MStorage("d", false, true, false));
-        int[] getfreepanages = pagemanager.getfreepanages(4097);
+        Pagemanager pagemanager = new Pagemanager(new MStorage("d"));
+        int[] getfreepanages = pagemanager.getfreepanages(4096);
         System.out.println(getfreepanages[0]);
         System.out.println(getfreepanages.length);
 

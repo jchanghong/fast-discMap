@@ -1,6 +1,5 @@
 package map.db;
 
-import map.htree.MHtree;
 import map.htree.MHtreeNode;
 
 import java.io.IOException;
@@ -9,16 +8,20 @@ import java.nio.ByteBuffer;
 /**
  * Created by jiang on 2016/12/19 0019.
  * 和内存指针差不多
- * new 得到地址
+ * new 后得到地址,这里地址是page index
+ * 每个页面开始分别是type，记录大小，数据，页面后2个字节用来连接每个页面
  */
 @SuppressWarnings("ControlFlowStatementWithoutBraces")
 public class DiscIO implements MdiscIO {
-    private static DiscIO instn = new DiscIO(new MStorage("d"));
+    private static DiscIO instn = new DiscIO(MStorage.getInstance());
+
     public static DiscIO getInstance() {
         return instn;
     }
+
     MStorage storage;
     Pagemanager pagemanager;
+
     public DiscIO(MStorage storage) {
         this.storage = storage;
         pagemanager = new Pagemanager(storage);
@@ -32,24 +35,25 @@ public class DiscIO implements MdiscIO {
      */
     @Override
     public int write(Object o) {
-
         byte[] bytes = ObjectSeriaer.getbytes(o);
         int[] pages = pagemanager.getfreepanages(bytes.length);
+        System.out.println("页面地址：" + pages[0] + "   大小：" + bytes.length);
         if (pages.length == 1) {
             try {
                 ByteBuffer buffer = storage.read(pages[0]);
-                if (o instanceof MHtree)
+                if (o instanceof DHtree)
                     buffer.putShort(Pagesize.pagehead_tree);
                 else {
                     buffer.putShort(Pagesize.pagehead_node);
                 }
+                buffer.putInt(bytes.length);
                 buffer.put(bytes);
+                storage.write(pages[0], buffer);
                 return pages[0];
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else {
+        } else {
             //
         }
         return 0;
@@ -61,18 +65,14 @@ public class DiscIO implements MdiscIO {
     }
 
     @Override
-    public Object read(int id) {
+    public <T> T read(int id) {
         try {
             ByteBuffer buffer = storage.read(id);
             short type = buffer.getShort();
+            int size = buffer.getInt();
             byte[] buff = new byte[buffer.remaining()];
             buffer.get(buff);
-            MHtreeNode mHtreeNode = null;
-            if (type == Pagesize.pagehead_node) {
-//                mHtreeNode = ObjectSeriaer.geto(buff);
-                return mHtreeNode;
-            }
-//            return ObjectSeriaer.geto(buff);
+            return ObjectSeriaer.getObject(buff);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -80,11 +80,11 @@ public class DiscIO implements MdiscIO {
     }
 
     public static void main(String[] args) throws IOException {
-        DiscIO discIO = new DiscIO(new MStorage("d"));
-        MHtreeNode node = new MHtreeNode(1, "d", "dd");
+        DiscIO discIO = DiscIO.getInstance();
+        DHtreeNode node = new DHtreeNode(1, "d", "dd66666666666666666666666666666666666666666");
         int i = discIO.write(node);
         System.out.println(i);
-        node = (MHtreeNode) discIO.read(i);
+        node = discIO.read(i);
         System.out.println(node.values);
     }
 }

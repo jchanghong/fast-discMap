@@ -16,5 +16,5 @@ public interface MdiscIO {
 
     int update(Object o, int recid);
 
-    Object read(int id);
+  <t>  t read(int id);
 }
