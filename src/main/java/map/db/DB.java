@@ -27,8 +27,12 @@ public class DB {
 
     public static void main(String[] args) {
         db = DB.getInstance("d");
+        db.createmap("map4");
+        db.createmap("map5");
 //        Map<String,Object> htree = db.createmap("map1");
-        DHtree dHtree = (DHtree) db.getmap("map1");
+        DHtree dHtree = (DHtree) db.getmap("map4");
+        System.out.println(dHtree.name);
+         dHtree = (DHtree) db.getmap("map5");
         System.out.println(dHtree.name);
     }
 

@@ -23,7 +23,7 @@ public class Pagemanager {
         int[] ints = new int[sum];
         int index = 0;
         for (int i = 512; i < Pagesize.max_page_number; i++) {
-            if (!MStorage.bitArray.get(i + 1)) {
+            if (!MStorage.bitArray.get(i)) {
                 ints[index++] = i;
                 MStorage.bitArray.set(i,true);
                 if (index >= sum) {

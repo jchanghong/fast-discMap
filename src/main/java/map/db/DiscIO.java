@@ -64,6 +64,7 @@ public class DiscIO implements MdiscIO {
                 buffer.putInt(bytes.length);
                 buffer.put(bytes);
                 storage.write(pages[0], buffer);
+                ObjectMap.putorupdate(o, pages[0]);
                 return pages[0];
             } catch (IOException e) {
                 e.printStackTrace();
@@ -90,6 +91,7 @@ public class DiscIO implements MdiscIO {
                 buffer.putInt(bytes.length);
                 buffer.put(bytes);
                 storage.write(pages[0], buffer);
+                ObjectMap.putorupdate(o, pages[0]);
                 return pages[0];
             } catch (IOException e) {
                 e.printStackTrace();
@@ -108,7 +110,9 @@ public class DiscIO implements MdiscIO {
             int size = buffer.getInt();
             byte[] buff = new byte[buffer.remaining()];
             buffer.get(buff);
-            return ObjectSeriaer.getObject(buff);
+            T object = ObjectSeriaer.getObject(buff);
+            ObjectMap.putorupdate(object, id);
+            return object;
         } catch (IOException e) {
             e.printStackTrace();
         }
