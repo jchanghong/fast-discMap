@@ -34,7 +34,7 @@ public class Pagemanager {
         return ints;
     }
     public static void main(String[] args) throws IOException {
-        Pagemanager pagemanager = new Pagemanager(new MStorage("d"));
+        Pagemanager pagemanager = new Pagemanager(MStorage.getInstance("d"));
         int[] getfreepanages = pagemanager.getfreepanages(4096);
         System.out.println(getfreepanages[0]);
         System.out.println(getfreepanages.length);

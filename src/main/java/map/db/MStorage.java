@@ -17,13 +17,15 @@ import java.util.List;
  * 文件前面2m保留做头信息1024*1024*2/4096=512页面
  */
 class MStorage {
-    private static MStorage int1 = new MStorage("d");
-
-    public static MStorage getInstance() {
+    private static MStorage int1;
+    public static MStorage getInstance(String filename) {
+        if (int1 == null) {
+            int1 = new MStorage(filename);
+        }
         return int1;
     }
     public static BitArray bitArray;
-    public MStorage(String fileName)  {
+    private MStorage(String fileName)  {
         this.fileName = fileName;
         this.transactionsDisabled = true;
         this.readonly = false;
@@ -47,7 +49,7 @@ class MStorage {
      * @throws IOException the io exception
      */
     public static void main(String[] args) throws IOException {
-        MStorage storage = MStorage.getInstance();
+        MStorage storage = MStorage.getInstance("d");
 //        for (int i = 0; i < 512; i++) {
 //            bitArray.set(i, true);
 //        }
@@ -105,7 +107,7 @@ class MStorage {
      * @param lockingDisabled      the locking disabled
      * @throws IOException the io exception
      */
-    public MStorage(String fileName, boolean readonly, boolean transactionsDisabled, boolean lockingDisabled) throws IOException {
+    private MStorage(String fileName, boolean readonly, boolean transactionsDisabled, boolean lockingDisabled) throws IOException {
         this.fileName = fileName;
         this.transactionsDisabled = transactionsDisabled;
         this.readonly = readonly;
@@ -147,7 +149,7 @@ class MStorage {
                 }
                 map.force();
                 if (headbuff == null) {
-                    headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 128 * 1024);
+                    headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 512 * 1024);
                     bitArray = new BitArray(headbuff);
                     for (int i = 0; i < 512; i++) {
             bitArray.set(i, true);
@@ -160,7 +162,7 @@ class MStorage {
             c.set(fileNumber, ret);
             buffers.put(ret, map);
             if (headbuff == null) {
-                headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 128 * 1024);
+                headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 512 * 1024);
                 bitArray = new BitArray(headbuff);
             }
         }

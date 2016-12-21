@@ -13,21 +13,27 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("Duplicates")
 public class DHtree implements Map<String,Object>,KryoSerializable{
-    static {
-        ObjectSeriaer.kryo.register(DHtree.class, 23);
-    }
      public DHtreeNode root;
+    public String name;
+
+    public DHtree() {
+    }
+
     @Override
     public void write(Kryo kryo, Output output) {
-        kryo.writeObjectOrNull(output, root, DHtreeNode.class);
+        kryo.writeObject(output, root);
+        output.writeString(name);
     }
     @Override
     public void read(Kryo kryo, Input input) {
-        root = kryo.readObjectOrNull(input, DHtreeNode.class);
+        root = kryo.readObject(input, DHtreeNode.class);
+        name = input.readString();
     }
-   transient public static List<DHtreeNode> nodes = new ArrayList<>(1000);
+   transient public  List<DHtreeNode> nodes = new ArrayList<>(1000);
 
-    public DHtree() {
+    public DHtree(String name) {
+        this.name
+                = name;
         root = new DHtreeNode(0, null, null);
         nodes.clear();
         nodes.add(root);
@@ -85,7 +91,7 @@ public class DHtree implements Map<String,Object>,KryoSerializable{
         DHtreeNode node = root.childsm[code0];
         if (node == null) {
             root.childsm[code0] = new DHtreeNode(1, key, value);
-            DHtree.nodes.add(root.childsm[code0]);
+//            DHtree.nodes.add(root.childsm[code0]);
             return null;
         }
         else {

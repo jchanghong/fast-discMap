@@ -1,7 +1,5 @@
 package map.db;
 
-import map.htree.MHtreeNode;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -13,16 +11,33 @@ import java.nio.ByteBuffer;
  */
 @SuppressWarnings("ControlFlowStatementWithoutBraces")
 public class DiscIO implements MdiscIO {
-    private static DiscIO instn = new DiscIO(MStorage.getInstance());
+    private static DiscIO instn = null;
 
-    public static DiscIO getInstance() {
+    public MStorage getStorage() {
+        return storage;
+    }
+
+    public Pagemanager getPagemanager() {
+        return pagemanager;
+    }
+
+    public static DiscIO getInstance(String filename) {
+        if (instn == null) {
+            instn = new DiscIO(filename);
+        }
         return instn;
     }
+
+    private DiscIO(String filename) {
+        this(MStorage.getInstance(filename));
+        this.filename = filename;
+    }
+    String filename;
 
     MStorage storage;
     Pagemanager pagemanager;
 
-    public DiscIO(MStorage storage) {
+    private DiscIO(MStorage storage) {
         this.storage = storage;
         pagemanager = new Pagemanager(storage);
     }
@@ -101,7 +116,7 @@ public class DiscIO implements MdiscIO {
     }
 
     public static void main(String[] args) throws IOException {
-        DiscIO discIO = DiscIO.getInstance();
+        DiscIO discIO = DiscIO.getInstance("d");
         DHtreeNode node = new DHtreeNode(1, "d", "dd66666666666666666666666666666666666666666");
         int i = discIO.write(node);
         System.out.println(i);
