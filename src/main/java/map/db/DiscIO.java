@@ -61,7 +61,28 @@ public class DiscIO implements MdiscIO {
 
     @Override
     public int update(Object o, int recid) {
-        return 0;
+        byte[] bytes = ObjectSeriaer.getbytes(o);
+        int[] pages = pagemanager.getfreepanages(bytes.length);
+        System.out.println("页面地址：" + pages[0] + "   大小：" + bytes.length);
+        if (pages.length == 1) {
+            try {
+                ByteBuffer buffer = storage.read(pages[0]);
+                if (o instanceof DHtree)
+                    buffer.putShort(Pagesize.pagehead_tree);
+                else {
+                    buffer.putShort(Pagesize.pagehead_node);
+                }
+                buffer.putInt(bytes.length);
+                buffer.put(bytes);
+                storage.write(pages[0], buffer);
+                return pages[0];
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            //
+        }
+        return recid;
     }
 
     @Override
@@ -84,6 +105,10 @@ public class DiscIO implements MdiscIO {
         DHtreeNode node = new DHtreeNode(1, "d", "dd66666666666666666666666666666666666666666");
         int i = discIO.write(node);
         System.out.println(i);
+        node = discIO.read(i);
+        System.out.println(node.values);
+        node.values = "Faaaa";
+        discIO.update(node, i);
         node = discIO.read(i);
         System.out.println(node.values);
     }
