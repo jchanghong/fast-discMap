@@ -1,5 +1,6 @@
 package map.db;
 
+import map.util.BitArray;
 import sun.misc.Cleaner;
 
 import java.io.*;
@@ -17,7 +18,7 @@ import java.util.List;
  * 文件前面2m保留做头信息1024*1024*2/4096=512页面
  */
 class MStorage {
-    public static BitSet bitSet;
+    public static BitArray bitArray;
     public MStorage(String fileName)  {
         this.fileName = fileName;
         this.transactionsDisabled = true;
@@ -43,10 +44,13 @@ class MStorage {
      */
     public static void main(String[] args) throws IOException {
         MStorage storage = new MStorage("d");
-        System.out.println(storage.bitSet.size()==Pagesize.max_page_number);
-        System.out.println(storage.bitSet.get(1));
-        System.out.println(storage.bitSet.get(33));
-//        storage.inithead();
+//        for (int i = 0; i < 512; i++) {
+//            bitArray.set(i, true);
+//        }
+//        bitArray.set(510, false);
+        System.out.println(bitArray.get(512));
+        System.out.println(bitArray.get(511));
+        System.out.println(bitArray.get(510));
     }
 
     /**
@@ -139,13 +143,12 @@ class MStorage {
                 }
                 map.force();
                 if (headbuff == null) {
-                    headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 17 * 1024);
+                    headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 128 * 1024);
+                    bitArray = new BitArray(headbuff);
+                    for (int i = 0; i < 512; i++) {
+            bitArray.set(i, true);
+        }
                 }
-                bitSet = new BitSet(Pagesize.max_page_number);
-                for (int i = 0; i < 512; i++) {
-                    bitSet.set(i + 1, true);
-                }
-                headbuff.put(ObjectSeriaer.getbytes(bitSet));
             }
             else {
                 map = ret.map(FileChannel.MapMode.READ_WRITE, 0, ret.size());
@@ -153,10 +156,8 @@ class MStorage {
             c.set(fileNumber, ret);
             buffers.put(ret, map);
             if (headbuff == null) {
-                headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 17 * 1024);
-                byte[] buff = new byte[16407];
-                headbuff.get(buff);
-                bitSet = ObjectSeriaer.getObject(buff);
+                headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 128 * 1024);
+                bitArray = new BitArray(headbuff);
             }
         }
         return ret;
