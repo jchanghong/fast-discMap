@@ -7,13 +7,34 @@ import java.io.*;
  */
 public class MHtreeNode implements Comparable<MHtreeNode> ,Externalizable{
 
-     public int high;//root si 0
-     public int code;
+    /**
+     * The High.
+     */
+    public int high;//root si 0
+    /**
+     * The Code.
+     */
+    public int code;
+    /**
+     * The Childs.
+     */
     public MHtreeNode[] childs;
+    /**
+     * The Has v.
+     */
     public boolean hasV;
+    /**
+     * The Key.
+     */
     public String key;
+    /**
+     * The Values.
+     */
     public Object values;
 
+    /**
+     * Instantiates a new M htree node.
+     */
     public MHtreeNode() {
     }
 
@@ -45,6 +66,13 @@ public class MHtreeNode implements Comparable<MHtreeNode> ,Externalizable{
         values = in.readObject();
     }
 
+    /**
+     * Instantiates a new M htree node.
+     *
+     * @param high   the high
+     * @param key    the key
+     * @param values the values
+     */
     public MHtreeNode(int high, String key, Object values) {
         this.high = high;
         code = MHashCodes.codes[high];

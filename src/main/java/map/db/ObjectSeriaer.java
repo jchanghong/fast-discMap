@@ -13,15 +13,25 @@ import java.util.BitSet;
  */
 @SuppressWarnings("TryWithIdenticalCatches")
 public class ObjectSeriaer {
-    //KryoException
+    /**
+     * The constant kryo.
+     */
+//KryoException
     public static Kryo kryo = new Kryo();
     private static byte[] mbuff = new byte[1024 * 32];
+    /**
+     * The Moutput.
+     */
     static Output moutput = new Output(mbuff);
+    /**
+     * The Minput.
+     */
     static Input minput = new Input(10);
 
     /**
      * Getbytes byte [ ].
-     *得到字节
+     * 得到字节
+     *
      * @param o the o
      * @return the byte [ ]
      */

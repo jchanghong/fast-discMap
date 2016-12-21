@@ -14,7 +14,21 @@ public interface MdiscIO {
      */
     int write(Object o);
 
+    /**
+     * Update int.
+     *
+     * @param o     the o
+     * @param recid the recid
+     * @return the int
+     */
     int update(Object o, int recid);
 
-  <t>  t read(int id);
+    /**
+     * Read t.
+     *
+     * @param <t> the type parameter
+     * @param id  the id
+     * @return the t
+     */
+    <t>  t read(int id);
 }

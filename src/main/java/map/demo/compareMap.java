@@ -10,13 +10,37 @@ import java.util.concurrent.ConcurrentHashMap;
  * 测试不同集合的查找速度
  */
 public class compareMap {
-  static   Map<String, Object> my = new MHtree();
-  static   Map<String, Object> map = new HashMap<>();
-  static   Map<String, Object> maptree = new TreeMap<>();
-  static   Map<String, Object> mapconcur = new ConcurrentHashMap<>();
-  static   List<String> list = new ArrayList<>();
-  static   int sum = 300000;
+    /**
+     * The My.
+     */
+    static   Map<String, Object> my = new MHtree();
+    /**
+     * The Map.
+     */
+    static   Map<String, Object> map = new HashMap<>();
+    /**
+     * The Maptree.
+     */
+    static   Map<String, Object> maptree = new TreeMap<>();
+    /**
+     * The Mapconcur.
+     */
+    static   Map<String, Object> mapconcur = new ConcurrentHashMap<>();
+    /**
+     * The List.
+     */
+    static   List<String> list = new ArrayList<>();
+    /**
+     * The Sum.
+     */
+    static   int sum = 300000;
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws Exception the exception
+     */
     public static void main(String[] args) throws Exception {
         setUp();
         long st = System.nanoTime();
@@ -42,7 +66,12 @@ public class compareMap {
 
     }
 
- static    public void setUp() throws Exception {
+    /**
+     * Sets up.
+     *
+     * @throws Exception the exception
+     */
+    static    public void setUp() throws Exception {
         for (int i = 0; i < sum; i++) {
             my.put(i + "asdf", i + "");
             map.put(i + "asdf", i + "");
@@ -54,14 +83,24 @@ public class compareMap {
 
     }
 
-  static   public void testlist() throws Exception {
+    /**
+     * Testlist.
+     *
+     * @throws Exception the exception
+     */
+    static   public void testlist() throws Exception {
         for (int i = 0; i < sum; i++) {
             Collections.binarySearch(list, i + "asdf");
 //            assertEquals(Collections.binarySearch(list,i+"asdf")>=0,true);
         }
     }
 
-  static   public void testmy() throws Exception {
+    /**
+     * Testmy.
+     *
+     * @throws Exception the exception
+     */
+    static   public void testmy() throws Exception {
         for (int i = 0; i < sum; i++) {
             my.get(i + "asdf");
 //            assertEquals(i + "", my.get(i + "asdf"));
@@ -70,7 +109,10 @@ public class compareMap {
 
     }
 
-   static public void testhashmap() {
+    /**
+     * Testhashmap.
+     */
+    static public void testhashmap() {
         for (int i = 0; i < sum; i++) {
             map.get(i + "asdf");
 //            assertEquals(i + "", map.get(i + "asdf"));
@@ -78,8 +120,12 @@ public class compareMap {
     }
 
 
-
-  static   public void testconc() throws Exception {
+    /**
+     * Testconc.
+     *
+     * @throws Exception the exception
+     */
+    static   public void testconc() throws Exception {
         for (int i = 0; i < sum; i++) {
             mapconcur.get(i + "asdf");
 //            assertEquals(i + "", mapconcur.get(i + "asdf"));
@@ -87,7 +133,12 @@ public class compareMap {
 
     }
 
- static    public void testtreemap() throws Exception {
+    /**
+     * Testtreemap.
+     *
+     * @throws Exception the exception
+     */
+    static    public void testtreemap() throws Exception {
         for (int i = 0; i < sum; i++) {
             maptree.get(i + "asdf");
 //            assertEquals(i + "", maptree.get(i + "asdf"));

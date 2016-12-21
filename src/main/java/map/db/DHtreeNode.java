@@ -13,14 +13,38 @@ import java.util.Optional;
  * Created by jiang on 2016/12/19 0019.
  */
 public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
+    /**
+     * The High.
+     */
     public int high;//root si 0
+    /**
+     * The Code.
+     */
     public int code;
+    /**
+     * The Childs.
+     */
     public int[] childs;//页面index 0kaishi
+    /**
+     * The Childsm.
+     */
     public DHtreeNode[] childsm;
+    /**
+     * The Has v.
+     */
     public boolean hasV;
+    /**
+     * The Key.
+     */
     public String key;
+    /**
+     * The Values.
+     */
     public Object values;
     private MdiscIO io;
+    /**
+     * The Map.
+     */
     ObjectMap map;
 
     @Override
@@ -81,10 +105,20 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
         }
     }
 
+    /**
+     * Instantiates a new D htree node.
+     */
     public DHtreeNode() {
         this(0, null, null);
     }
 
+    /**
+     * Instantiates a new D htree node.
+     *
+     * @param high   the high
+     * @param key    the key
+     * @param values the values
+     */
     public DHtreeNode(int high, String key, Object values) {
         this.high = high;
         code = MHashCodes.codes[high];

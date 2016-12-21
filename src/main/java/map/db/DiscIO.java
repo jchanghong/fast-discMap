@@ -13,14 +13,30 @@ import java.nio.ByteBuffer;
 public class DiscIO implements MdiscIO {
     private static DiscIO instn = null;
 
+    /**
+     * Gets storage.
+     *
+     * @return the storage
+     */
     public MStorage getStorage() {
         return storage;
     }
 
+    /**
+     * Gets pagemanager.
+     *
+     * @return the pagemanager
+     */
     public Pagemanager getPagemanager() {
         return pagemanager;
     }
 
+    /**
+     * Gets instance.
+     *
+     * @param filename the filename
+     * @return the instance
+     */
     public static DiscIO getInstance(String filename) {
         if (instn == null) {
             instn = new DiscIO(filename);
@@ -33,9 +49,18 @@ public class DiscIO implements MdiscIO {
         this.filename = filename;
     }
 
+    /**
+     * The Filename.
+     */
     String filename;
 
+    /**
+     * The Storage.
+     */
     MStorage storage;
+    /**
+     * The Pagemanager.
+     */
     Pagemanager pagemanager;
 
     private DiscIO(MStorage storage) {
@@ -123,6 +148,12 @@ public class DiscIO implements MdiscIO {
         return null;
     }
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws IOException the io exception
+     */
     public static void main(String[] args) throws IOException {
         DiscIO discIO = DiscIO.getInstance("d");
         DHtreeNode node = new DHtreeNode(1, "d", "dd66666666666666666666666666666666666666666");

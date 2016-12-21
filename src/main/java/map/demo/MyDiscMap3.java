@@ -23,7 +23,16 @@ public class MyDiscMap3 implements Map<String, Object> ,Log {
     private int filesize = 0;
     private MappedByteBuffer buffer;//性能原因。保存
   volatile private   Map<String, Object> map;
+    /**
+     * The Executor.
+     */
     ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    /**
+     * Instantiates a new My disc map 3.
+     *
+     * @param file the file
+     */
     public MyDiscMap3(String file) {
         try {
             fileChannel = new RandomAccessFile(file,"rw").getChannel();
@@ -162,6 +171,10 @@ public class MyDiscMap3 implements Map<String, Object> ,Log {
         }
 
     };
+
+    /**
+     * Close.
+     */
     public void close() {
         executor.shutdownNow();
         byte[] bytes = getEsirabytes(map);

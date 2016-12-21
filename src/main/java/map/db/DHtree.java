@@ -13,8 +13,17 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("Duplicates")
 public class DHtree implements Map<String, Object>, KryoSerializable, Comparable<DHtree> {
+    /**
+     * The Root.
+     */
     public DHtreeNode root;
+    /**
+     * The Name.
+     */
     public String name;
+    /**
+     * The Size.
+     */
     public int size;
 
     @Override
@@ -46,11 +55,23 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
         return super.equals(obj);
     }
 
+    /**
+     * Instantiates a new D htree.
+     */
     public DHtree() {
 
     }
+
+    /**
+     * The Nodes.
+     */
     transient public List<DHtreeNode> nodes = new ArrayList<>(1000);
 
+    /**
+     * Instantiates a new D htree.
+     *
+     * @param name the name
+     */
     public DHtree(String name) {
         this.name
                 = name;
@@ -81,7 +102,10 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
         return nodes.stream().filter(a -> a.hasV && a.values.equals(value)).count() > 0;
     }
 
-   static DiscIO io = DiscIO.getInstance("d");
+    /**
+     * The Io.
+     */
+    static DiscIO io = DiscIO.getInstance("d");
     @Override
     public Object get(Object key) {
         if (key == null) {
@@ -112,6 +136,7 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
         if (node == 0) {
             root.childsm[code0] = new DHtreeNode(1, key, value);
             root.childs[code0] = io.write(root.childsm[code0]);
+            size++;
             io.update(this, ObjectMap.getindex(this));
             return null;
         } else {

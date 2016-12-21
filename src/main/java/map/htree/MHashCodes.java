@@ -8,7 +8,16 @@ import java.util.List;
  * Created by jiang on 2016/12/19 0019.
  */
 public class MHashCodes {
+    /**
+     * The constant codes.
+     */
     public static int[] codes = new int[]{997, 991, 983, 977, 971, 967, 953, 947, 941, 937};
+
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         int sum = 1000;
         List<Integer> integers = new ArrayList<>();

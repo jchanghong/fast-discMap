@@ -19,6 +19,12 @@ import java.util.List;
 class MStorage {
     private static MStorage int1;
 
+    /**
+     * Gets instance.
+     *
+     * @param filename the filename
+     * @return the instance
+     */
     public static MStorage getInstance(String filename) {
         if (int1 == null) {
             int1 = new MStorage(filename);
@@ -26,6 +32,9 @@ class MStorage {
         return int1;
     }
 
+    /**
+     * The constant bitArray.
+     */
     public static BitArray bitArray;
 
     private MStorage(String fileName) {
@@ -94,7 +103,10 @@ class MStorage {
     private ArrayList<FileChannel> channels = new ArrayList<FileChannel>();
     private ArrayList<FileChannel> channelsTranslation = new ArrayList<FileChannel>();
     private IdentityHashMap<FileChannel, MappedByteBuffer> buffers = new IdentityHashMap<FileChannel, MappedByteBuffer>();
-    /*head=128kb,32页面*/
+    /**
+     * The Headbuff.
+     */
+/*head=128kb,32页面*/
     public MappedByteBuffer headbuff;
     private String fileName;
     private boolean transactionsDisabled;
@@ -129,6 +141,9 @@ class MStorage {
 
     }
 
+    /**
+     * The constant init.
+     */
     public static boolean init;
 
     private FileChannel getChannel(long pageNumber) throws IOException {

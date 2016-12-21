@@ -7,7 +7,16 @@ import java.io.IOException;
  * 页面分配
  */
 public class Pagemanager {
+    /**
+     * The Storage.
+     */
     MStorage storage;
+
+    /**
+     * Instantiates a new Pagemanager.
+     *
+     * @param storage the storage
+     */
     public Pagemanager(MStorage storage) {
         this.storage = storage;
     }
@@ -34,6 +43,13 @@ public class Pagemanager {
         }
         return ints;
     }
+
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     * @throws IOException the io exception
+     */
     public static void main(String[] args) throws IOException {
         Pagemanager pagemanager = new Pagemanager(MStorage.getInstance("d"));
         int[] getfreepanages = pagemanager.getfreepanages(4096);

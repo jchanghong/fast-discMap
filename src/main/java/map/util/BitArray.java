@@ -10,23 +10,77 @@ import java.util.BitSet;
  */
 public class BitArray {
 
+    /**
+     * The Buffer.
+     */
     ByteBuffer buffer;
+    /**
+     * The Mask.
+     */
     static int mask = 0xff;
+    /**
+     * The True 0.
+     */
     static int true0 = 128;
+    /**
+     * The Treue 1.
+     */
     static int treue1 = 64;
+    /**
+     * The Treue 2.
+     */
     static int treue2 = 32;
+    /**
+     * The Treue 3.
+     */
     static int treue3 = 16;
+    /**
+     * The Treue 4.
+     */
     static int treue4 = 8;
+    /**
+     * The Treue 5.
+     */
     static int treue5 = 4;
+    /**
+     * The Treue 6.
+     */
     static int treue6 = 2;
+    /**
+     * The True 7.
+     */
     static int true7 = 1;
+    /**
+     * The F 0.
+     */
     static int f0 = 127;
+    /**
+     * The F 1.
+     */
     static int f1 = 0xbf;
+    /**
+     * The F 2.
+     */
     static int f2 = 0xdf;
+    /**
+     * The F 3.
+     */
     static int f3 = 0xef;
+    /**
+     * The F 4.
+     */
     static int f4 = 0xf7;
+    /**
+     * The F 5.
+     */
     static int f5 = 0xfb;
+    /**
+     * The F 6.
+     */
     static int f6 = 0xfd;
+    /**
+     * The F 7.
+     */
     static int f7 = 0xfe;
 
     /**
@@ -155,6 +209,11 @@ public class BitArray {
         buffer.put(index / 8, (byte) b1);
     }
 
+    /**
+     * The entry point of application.
+     *
+     * @param sss the input arguments
+     */
     public static void main(String[] sss) {
         ByteBuffer buffer = ByteBuffer.allocate(16);
         BitArray bitArray = new BitArray(buffer);

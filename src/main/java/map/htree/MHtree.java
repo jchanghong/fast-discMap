@@ -10,8 +10,14 @@ import java.util.stream.Collectors;
 @SuppressWarnings("Duplicates")
 public class MHtree implements Map<String,Object>,Serializable{
      private   MHtreeNode root;
+    /**
+     * The constant nodes.
+     */
     public static List<MHtreeNode> nodes = new ArrayList<>(1000);
 
+    /**
+     * Instantiates a new M htree.
+     */
     public MHtree() {
         root = new MHtreeNode(0, null, null);
         nodes.clear();

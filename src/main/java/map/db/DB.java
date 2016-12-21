@@ -26,6 +26,11 @@ public class DB {
         map_map = ObjectSeriaer.getObject(bytes);
     }
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         db = DB.getInstance("d");
         db.createorGetmap("map4");
@@ -42,9 +47,18 @@ public class DB {
 
     }
 
+    /**
+     * The Headbuff.
+     */
     MappedByteBuffer headbuff;
     private static DB db;
+    /**
+     * The Disc io.
+     */
     DiscIO discIO;
+    /**
+     * The Map map.
+     */
     Map<String, Integer> map_map;
 
     private DB(String filename) {
@@ -58,6 +72,12 @@ public class DB {
         setMap_map();
     }
 
+    /**
+     * Gets instance.
+     *
+     * @param filename the filename
+     * @return the instance
+     */
     public static DB getInstance(String filename) {
         if (db == null) {
             db = new DB(filename);
@@ -65,10 +85,23 @@ public class DB {
         return db;
     }
 
+    /**
+     * Gets .name必须存在
+     *
+     * @param mapname the mapname
+     * @return the
+     */
     public  Map<String, Object> getmap(String mapname) {
         int index = map_map.get(mapname);
         return discIO.read(index);
     }
+
+    /**
+     * Createor getmap map.一般用这个方法，如果不存在，就新建立map
+     *
+     * @param mapname the mapname
+     * @return the map
+     */
     public  Map<String, Object> createorGetmap(String mapname) {
         if (map_map.containsKey(mapname)) {
             return getmap(mapname);
