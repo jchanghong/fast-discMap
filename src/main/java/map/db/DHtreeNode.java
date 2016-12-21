@@ -22,6 +22,24 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
     ObjectMap map;
 
     @Override
+    public String toString() {
+
+        int length;
+        if (childs == null) {
+            length = 0;
+        } else {
+            length = childs.length;
+        }
+        int length1;
+        if (childsm == null) {
+            length1 = 0;
+        } else {
+            length1 = childsm.length;
+        }
+        return code + key + values + "s:  " + length + "    m:" + length1;
+    }
+
+    @Override
     public void write(Kryo kryo, Output out) {
         out.write(high);
         kryo.writeObjectOrNull(out, childs, int[].class);
@@ -43,6 +61,7 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
             if (key != null) {
                 return key.equals(node.key);
             }
+            return node.key.equals(key);
         }
         return super.equals(obj);
     }
@@ -167,8 +186,15 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
 
     @Override
     public int compareTo(DHtreeNode o) {
+        int i = high - o.high;
+        if (i != 0) {
+            return i;
+        }
+        if (o == null) {
+            return 1;
+        }
         if (key == null) {
-            return o == null ? 0 : o.compareTo(this);
+            return o.key == null ? 0 : o.key.compareTo(key);
         }
         return key.compareTo(o.key);
     }

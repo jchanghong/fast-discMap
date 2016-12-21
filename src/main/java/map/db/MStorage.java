@@ -18,14 +18,17 @@ import java.util.List;
  */
 class MStorage {
     private static MStorage int1;
+
     public static MStorage getInstance(String filename) {
         if (int1 == null) {
             int1 = new MStorage(filename);
         }
         return int1;
     }
+
     public static BitArray bitArray;
-    private MStorage(String fileName)  {
+
+    private MStorage(String fileName) {
         this.fileName = fileName;
         this.transactionsDisabled = true;
         this.readonly = false;
@@ -77,7 +80,7 @@ class MStorage {
     /**
      * use 'val & OFFSET_MASK' to quickly get offset within the page;
      */
-    static final long OFFSET_MASK = 0xFFFFFFFFFFFFFFFFL >>> (64 -12);
+    static final long OFFSET_MASK = 0xFFFFFFFFFFFFFFFFL >>> (64 - 12);
     /**
      * The Idr.
      */
@@ -126,6 +129,8 @@ class MStorage {
 
     }
 
+    public static boolean init;
+
     private FileChannel getChannel(long pageNumber) throws IOException {
         int fileNumber = (int) (Math.abs(pageNumber) / Pagesize.max_page_number);
 
@@ -143,8 +148,8 @@ class MStorage {
             ret = new RandomAccessFile(name, "rw").getChannel();
             MappedByteBuffer map;
             if (ret.size() < 128 * 1024) {
-                map = ret.map(FileChannel.MapMode.READ_WRITE, 0, 64*1024*1024);
-                for (int i = 0; i < 1024 *16; i++) {
+                map = ret.map(FileChannel.MapMode.READ_WRITE, 0, 64 * 1024 * 1024);
+                for (int i = 0; i < 1024 * 16; i++) {
                     map.put(CLEAN_DATA);
                 }
                 map.force();
@@ -152,12 +157,13 @@ class MStorage {
                     headbuff = ret.map(FileChannel.MapMode.READ_WRITE, 0, 512 * 1024);
                     bitArray = new BitArray(headbuff);
                     for (int i = 0; i < 512; i++) {
-            bitArray.set(i, true);
-        }
+                        bitArray.set(i, true);
+                    }
+                    init = true;
                 }
-            }
-            else {
+            } else {
                 map = ret.map(FileChannel.MapMode.READ_WRITE, 0, ret.size());
+                init = false;
             }
             c.set(fileNumber, ret);
             buffers.put(ret, map);

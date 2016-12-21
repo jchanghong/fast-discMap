@@ -1,6 +1,9 @@
 package map.db;
 
+import map.htree.HtreeTest;
+
 import java.nio.MappedByteBuffer;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -8,8 +11,8 @@ import java.util.Map;
  */
 public class DB {
     private void updatemap() {
-        if (map_map.size() < 1) {
-            return;
+        if (map_map==null||map_map.size() < 1) {
+            map_map = new HashMap<>();
         }
         headbuff.position(128 * 1024);
         byte[] bytes = ObjectSeriaer.getbytes(map_map);
@@ -34,6 +37,11 @@ public class DB {
         System.out.println(dHtree.name);
          dHtree = (DHtree) db.getmap("map5");
         System.out.println(dHtree.name);
+
+        db.createmap("mymap");
+        dHtree = (DHtree) db.getmap("mymap");
+        System.out.println(dHtree.root);
+
     }
 
     MappedByteBuffer headbuff;
@@ -46,6 +54,9 @@ public class DB {
         headbuff = discIO.getStorage().headbuff;
         ObjectSeriaer.kryo.register(DHtree.class, 23);
         ObjectSeriaer.kryo.register(DHtreeNode.class, 22);
+        if (MStorage.init) {
+            updatemap();
+        }
         setMap_map();
     }
 
@@ -61,6 +72,9 @@ public class DB {
         return discIO.read(index);
     }
     public  Map<String, Object> createmap(String mapname) {
+        if (map_map.containsKey(mapname)) {
+            return getmap(mapname);
+        }
         DHtree htree = new DHtree(mapname);
         int in = discIO.write(htree);
         map_map.put(mapname, in);

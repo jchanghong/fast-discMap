@@ -12,24 +12,44 @@ import java.util.stream.Collectors;
  * Created by jiang on 2016/12/19 0019.
  */
 @SuppressWarnings("Duplicates")
-public class DHtree implements Map<String,Object>,KryoSerializable{
-     public DHtreeNode root;
+public class DHtree implements Map<String, Object>, KryoSerializable, Comparable<DHtree> {
+    public DHtreeNode root;
     public String name;
-
-    public DHtree() {
-    }
+    public int size;
 
     @Override
     public void write(Kryo kryo, Output output) {
         kryo.writeObject(output, root);
         output.writeString(name);
+        output.writeInt(size);
     }
+
     @Override
     public void read(Kryo kryo, Input input) {
         root = kryo.readObject(input, DHtreeNode.class);
         name = input.readString();
+        size = input.readInt();
+        if (this.root.childsm == null) {
+            this.root.childsm = new DHtreeNode[this.root.code];
+        }
     }
-   transient public  List<DHtreeNode> nodes = new ArrayList<>(1000);
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof DHtree) {
+            DHtree o = (DHtree) obj;
+            return name.equals(o.name) && root.equals(o.root);
+        }
+        return super.equals(obj);
+    }
+
+    public DHtree() {
+
+    }
+    transient public List<DHtreeNode> nodes = new ArrayList<>(1000);
 
     public DHtree(String name) {
         this.name
@@ -48,67 +68,70 @@ public class DHtree implements Map<String,Object>,KryoSerializable{
 
     @Override
     public boolean isEmpty() {
-        return size()==0;
+        return size() == 0;
     }
 
     @Override
-    public boolean containsKey(Object key)
-    {
+    public boolean containsKey(Object key) {
         return get(key) != null;
     }
 
     @Override
     public boolean containsValue(Object value) {
-      return   nodes.stream().filter(a -> a.hasV && a.values.equals(value)).count()>0;
+        return nodes.stream().filter(a -> a.hasV && a.values.equals(value)).count() > 0;
     }
 
+   static DiscIO io = DiscIO.getInstance("d");
     @Override
     public Object get(Object key) {
         if (key == null) {
             throw new NullPointerException("key not null");
         }
         int hashcode = Math.abs(key.hashCode());
-        int code0 = hashcode %root.code;
-        DHtreeNode node = root.childsm[code0];
-        if (node == null) {
+        int code0 = hashcode % root.code;
+        int node = root.childs[code0];
+        if (node == 0) {
             return null;
-        }
-        else {
-            if (node.hasV && node.key.equals(key)) {
-                return node.values;
+        } else {
+            DHtreeNode chid = io.read(node);
+            if (chid.hasV && chid.equals(key)) {
+                return chid.values;
             }
-            return node.getChild(key, hashcode);
+            return chid.getChild(key, hashcode);
         }
     }
 
     @Override
     public Object put(String key, Object value) {
-        if (key == null||value==null) {
+        if (key == null || value == null) {
             throw new NullPointerException("key not null");
         }
         int hashcode = Math.abs(key.hashCode());
         int code0 = hashcode % root.code;
-        DHtreeNode node = root.childsm[code0];
-        if (node == null) {
+        int node = root.childs[code0];
+        if (node == 0) {
             root.childsm[code0] = new DHtreeNode(1, key, value);
-//            DHtree.nodes.add(root.childsm[code0]);
+            root.childs[code0] = io.write(root.childsm[code0]);
+            io.update(root, ObjectMap.getindex(root));
             return null;
-        }
-        else {
-            if (node.hasV&&node.key.equals(key)) {
-                node.values = value;
-                return node;
+        } else {
+            DHtreeNode chid = io.read(node);
+            root.childsm[code0] = chid;
+            if (chid.hasV && chid.key.equals(key)) {
+                Object o = chid.values;
+                chid.values = value;
+                io.update(chid, ObjectMap.getindex(chid));
+                return o;
             }
-            if (!node.hasV) {
-                node.hasV = true;
-                node.key = key;
-                node.values = value;
+            if (!chid.hasV) {
+                chid.hasV = true;
+                chid.key = key;
+                chid.values = value;
+                io.update(chid, ObjectMap.getindex(chid));
                 return null;
+            } else {
+                return chid.putchild(key, value, hashcode);
             }
-            else {
-                return node.putchild(key, value,hashcode);
-            }
-
         }
     }
 
@@ -122,14 +145,13 @@ public class DHtree implements Map<String,Object>,KryoSerializable{
         DHtreeNode node = root.childsm[code0];
         if (node == null) {
             return null;
-        }
-        else {
-            if (node.hasV&&node.key.equals(key)) {
-                node.hasV=false;
+        } else {
+            if (node.hasV && node.key.equals(key)) {
+                node.hasV = false;
                 return node.values;
             }
 
-                return node.removeChild(key,hashcode);
+            return node.removeChild(key, hashcode);
 
 
         }
@@ -161,12 +183,13 @@ public class DHtree implements Map<String,Object>,KryoSerializable{
 
     @Override
     public Set<Entry<String, Object>> entrySet() {
-        Set collect = nodes.stream().filter(a -> a.hasV).map(a ->{
+        Set collect = nodes.stream().filter(a -> a.hasV).map(a -> {
             return new Entry() {
                 @Override
                 public Object getKey() {
                     return a.key;
                 }
+
                 @Override
                 public Object getValue() {
                     return a.values;
@@ -187,4 +210,14 @@ public class DHtree implements Map<String,Object>,KryoSerializable{
     }
 
 
+    @Override
+    public int compareTo(DHtree o) {
+        if (name == null) {
+            if (o.name == null) {
+                return 0;
+            } else {
+                return -1;
+            }
+        } else return name.compareTo(o.name);
+    }
 }
