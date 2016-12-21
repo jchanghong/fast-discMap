@@ -9,7 +9,6 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 
