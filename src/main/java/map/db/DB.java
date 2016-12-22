@@ -13,6 +13,7 @@ package map.db;
 import java.nio.MappedByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by jiang on 2016/12/21 0021.
@@ -129,5 +130,15 @@ public class DB {
         return htree;
     }
 
+
+    /**
+     * Mapsets set.
+     *
+     * @return the set 得到所有的map
+     */
+    public Set<String> mapsets() {
+
+        return map_map.keySet();
+    }
 
 }
