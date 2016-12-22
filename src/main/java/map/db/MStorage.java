@@ -55,7 +55,7 @@ class MStorage {
      * The constant init.
      */
     public static boolean init;
-//    static final byte[] all_zear_bytes = new byte[Pagesize.page_size];
+    //    static final byte[] all_zear_bytes = new byte[Pagesize.page_size];
 //    static {
 //        for (int i = 0; i < Pagesize.page_size; i++) {
 //            all_zear_bytes[i] = 0;
@@ -74,6 +74,7 @@ class MStorage {
     private boolean transactionsDisabled;
     private boolean readonly;
     private boolean lockingDisabled;
+
     private MStorage(String fileName) {
         this.fileName = fileName;
         this.transactionsDisabled = true;
@@ -87,6 +88,7 @@ class MStorage {
             throw new NullPointerException("Could not lock DB file: " + fileName);
         }
     }
+
     /**
      * Instantiates a new M storage.
      *

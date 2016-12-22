@@ -39,7 +39,7 @@ public class Pagemanager {
      */
     public static void main(String[] args) throws IOException {
         Pagemanager pagemanager = new Pagemanager(MStorage.getInstance("d"));
-        int[] getfreepanages = pagemanager.getfreepanages(4096);
+        int[] getfreepanages = pagemanager.getfreepanages(4089);
         System.out.println(getfreepanages[0]);
         System.out.println(getfreepanages.length);
 
@@ -54,7 +54,7 @@ public class Pagemanager {
      */
 //0开始
     public int[] getfreepanages(int recsize) {
-        int sum = (recsize - 1) / Pagesize.page_size + 1;
+        int sum = (recsize - 1) / Pagesize.page_size_for_content + 1;
         int[] ints = new int[sum];
         int index = 0;
         for (int i = 512; i < Pagesize.max_page_number; i++) {

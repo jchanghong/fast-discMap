@@ -43,4 +43,8 @@ public interface Pagesize {
      * The constant pagehead_other.
      */
     short pagehead_other = 2;
+    /**
+     * The constant page_size_for_content.
+     */
+    int page_size_for_content = Pagesize.page_size - 10;
 }

@@ -19,6 +19,10 @@ import java.util.Map;
  */
 @SuppressWarnings("ALL")
 public class DB {
+    /**
+     * The Debug.
+     */
+    static public boolean debug = false;
     private static DB db;
     /**
      * The Headbuff.
@@ -32,6 +36,7 @@ public class DB {
      * The Map map.
      */
     Map<String, Integer> map_map;
+
     private DB(String filename) {
         discIO = DiscIO.getInstance(filename);
         headbuff = discIO.getStorage().headbuff;
