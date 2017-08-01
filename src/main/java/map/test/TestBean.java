@@ -11,6 +11,7 @@
 package map.test;
 
 import map.db.ObjectSeriaer;
+import map.htreemap.HtreeNode;
 
 /**
  * \* Created with IntelliJ IDEA.
@@ -22,13 +23,10 @@ import map.db.ObjectSeriaer;
 public class TestBean {
     public int anInt=1;
     public static void main(String[] args) {
-        TestBean testBean = new TestBean();
-        testBean.anInt=3;
+        HtreeNode testBean = new HtreeNode(0,null,1);
         byte[] bytes = ObjectSeriaer.getbytes(testBean);
-        System.out.println(bytes.length);
-
-        TestBean testBean1 = ObjectSeriaer.getObject(bytes);
-        System.out.println(testBean1.anInt);
+        HtreeNode testBean1 = ObjectSeriaer.getObject(bytes);
+        System.out.println(testBean1.toString());
 
     }
 }

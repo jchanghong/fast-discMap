@@ -27,6 +27,10 @@ import com.google.common.base.Objects;
  */
 public class HtreeNode {
 
+    //序列化
+    public HtreeNode() {
+    }
+
     /**
      * The High.
      */
