@@ -25,7 +25,7 @@ public class HtreeNode implements Comparable<HtreeNode>, Externalizable {
     /**
      * The High.
      */
-    public int high;//root si 0
+    public int high;//root is 0
     /**
      * The Code.
      */
