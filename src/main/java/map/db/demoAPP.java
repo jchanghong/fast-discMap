@@ -26,6 +26,7 @@ public class demoAPP {
     public static void main(String[] args) {
         DB db = DB.getInstance("d2");
         Map<String, Object> map = db.createorGetmap("db163");
+
         map.put("11", "11");
         map.put("22", "22");
         map.remove("11");
