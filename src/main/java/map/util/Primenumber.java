@@ -10,6 +10,9 @@
 
 package map.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,8 +25,10 @@ import java.util.List;
  */
 public class Primenumber {
 
+    private static final Logger logger = LoggerFactory.getLogger(Primenumber.class.getName());
     public static void main(String[] args) {
         List<Integer> primes = getPrimes(1000);
+        logger.debug(primes.size()+"");
         primes.stream().filter(a -> a > 990 && a < 1100).limit(2).forEach(a -> System.out.println(a));
     }
     public static List<Integer> getPrimes(int numbers) {
