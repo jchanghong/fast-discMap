@@ -23,6 +23,7 @@ package map.htreemap;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -47,18 +48,36 @@ public class HtreeTest {
         map.remove("9");
         Assert.assertEquals(map.size(), 49999);
         Assert.assertEquals(map.get("9"), null);
-        HTreeMap hTreeMap = (HTreeMap) map;
-        System.out.println(hTreeMap.high());
+        map.put("9", "ddd");
+        Assert.assertEquals("ddd",map.get("9"));
+
+    }
+    @Test
+    public  void mainshashmap() {
+        Map<String, Object> map = new HashMap<>();
+        for (int i=0;i<50000;i++) {
+            map.put(i + "", i);
+        }
+        for (int i=0;i<5000;i++) {
+            Assert.assertEquals(map.get(i + ""), i);
+        }
+        Assert.assertEquals(map.size(), 50000);
+        map.remove("9");
+        Assert.assertEquals(map.size(), 49999);
+        Assert.assertEquals(map.get("9"), null);
+        map.put("9", "ddd");
+        Assert.assertEquals("ddd",map.get("9"));
 
     }
 
     @Test
     public void testprint() throws Exception {
         HTreeMap map = new HTreeMap();
-        for (int i=0;i<20;i++) {
+        for (int i=0;i<2000;i++) {
             map.put(i + "", i);
         }
-        map.printTree();
+        Assert.assertEquals(map.get("1999"),1999);
+//        map.printTree();
 
     }
 }

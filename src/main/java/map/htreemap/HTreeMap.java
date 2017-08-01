@@ -21,6 +21,8 @@
 package map.htreemap;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.*;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("Duplicates")
 public class HTreeMap implements Map<String, Object> ,Serializable{
+    private static final Logger LOGGER = LoggerFactory.getLogger(HTreeMap.class);
     /**
      * The constant allnodes.
      */
@@ -85,7 +88,9 @@ public class HTreeMap implements Map<String, Object> ,Serializable{
         int hashcode = Math.abs(key.hashCode());
         HtreeNode htreeNode = root;
         while (htreeNode != null) {
+            LOGGER.debug("this node is:" + htreeNode.key);
             if (htreeNode.hasV && key.equals(htreeNode.key)) {
+                LOGGER.debug("find " + key);
                 return htreeNode.values;
             }
             int hashindex = hashcode % htreeNode.hashtable_size;
