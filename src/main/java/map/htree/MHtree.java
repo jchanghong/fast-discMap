@@ -34,7 +34,7 @@ public class MHtree implements Map<String, Object>, Serializable {
         root = new HtreeNode(0, null, null);
         nodes.clear();
         nodes.add(root);
-        root.childs = new HtreeNode[root.code];
+        root.childs = new HtreeNode[root.hashtable_size];
     }
 
     @Override
@@ -63,7 +63,7 @@ public class MHtree implements Map<String, Object>, Serializable {
             throw new NullPointerException("key not null");
         }
         int hashcode = Math.abs(key.hashCode());
-        int code0 = hashcode % root.code;
+        int code0 = hashcode % root.hashtable_size;
         HtreeNode node = root.childs[code0];
         if (node == null) {
             return null;
@@ -81,7 +81,7 @@ public class MHtree implements Map<String, Object>, Serializable {
             throw new NullPointerException("key not null");
         }
         int hashcode = Math.abs(key.hashCode());
-        int code0 = hashcode % root.code;
+        int code0 = hashcode % root.hashtable_size;
         HtreeNode node = root.childs[code0];
         if (node == null) {
             root.childs[code0] = new HtreeNode(1, key, value);
@@ -110,7 +110,7 @@ public class MHtree implements Map<String, Object>, Serializable {
             throw new NullPointerException("key not null");
         }
         int hashcode = Math.abs(key.hashCode());
-        int code0 = hashcode % root.code;
+        int code0 = hashcode % root.hashtable_size;
         HtreeNode node = root.childs[code0];
         if (node == null) {
             return null;

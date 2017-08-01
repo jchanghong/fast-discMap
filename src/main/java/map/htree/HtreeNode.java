@@ -29,7 +29,7 @@ public class HtreeNode implements Comparable<HtreeNode>, Externalizable {
     /**
      * The Code.
      */
-    public int code;
+    public int hashtable_size;
     /**
      * The Childs.
      */
@@ -51,6 +51,9 @@ public class HtreeNode implements Comparable<HtreeNode>, Externalizable {
      * Instantiates a new M htree node.
      */
     public HtreeNode() {
+        high=0;
+        hashtable_size = HashCodes.codes[high];
+        childs = new HtreeNode[hashtable_size];
     }
 
     /**
@@ -62,10 +65,10 @@ public class HtreeNode implements Comparable<HtreeNode>, Externalizable {
      */
     public HtreeNode(int high, String key, Object values) {
         this.high = high;
-        code = HashCodes.codes[high];
+        hashtable_size = HashCodes.codes[high];
         this.key = key;
         this.values = values;
-        hasV = !(key == null || high == 0);
+        hasV = key != null;
     }
 
     @Override
@@ -81,7 +84,7 @@ public class HtreeNode implements Comparable<HtreeNode>, Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 
         this.high = in.read();
-        this.code = HashCodes.codes[high];
+        this.hashtable_size = HashCodes.codes[high];
         childs = (HtreeNode[]) in.readObject();
         hasV = in.readBoolean();
         try {
@@ -103,9 +106,9 @@ public class HtreeNode implements Comparable<HtreeNode>, Externalizable {
      * @return the object
      */
     public Object putchild(String key, Object values, int hashcode) {
-        int mycode = hashcode % code;
+        int mycode = hashcode % hashtable_size;
         if (childs == null) {
-            childs = new HtreeNode[code];
+            childs = new HtreeNode[hashtable_size];
             childs[mycode] = new HtreeNode(high + 1, key, values);
             MHtree.nodes.add(childs[mycode]);
             return values;
@@ -138,7 +141,7 @@ public class HtreeNode implements Comparable<HtreeNode>, Externalizable {
      * @return the child
      */
     public Object getChild(Object key, int hashcode) {
-        int mycode = hashcode % code;
+        int mycode = hashcode % hashtable_size;
         if (childs == null) {
             return null;
         }
@@ -160,7 +163,7 @@ public class HtreeNode implements Comparable<HtreeNode>, Externalizable {
      * @return the object 之前的v
      */
     public Object removeChild(Object key, int hashcode) {
-        int mycode = hashcode % code;
+        int mycode = hashcode % hashtable_size;
         if (childs == null) {
             return null;
         }
