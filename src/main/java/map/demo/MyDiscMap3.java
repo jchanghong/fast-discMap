@@ -11,7 +11,7 @@
 package map.demo;
 
 
-import map.htree.Log;
+import map.htreemap.Log;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;

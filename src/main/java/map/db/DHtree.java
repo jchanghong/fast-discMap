@@ -122,7 +122,7 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
 
     @Override
     public boolean containsValue(Object value) {
-//        return nodes.stream().filter(a -> a.hasV && a.values.equals(value)).count() > 0;
+//        return allnodes.stream().filter(a -> a.hasV && a.values.equals(value)).count() > 0;
         return false;
     }
 
@@ -225,7 +225,7 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
     @NotNull
     @Override
     public Set<String> keySet() {
-//        Set<String> collect = nodes.stream().filter(a -> a.hasV).map(a -> a.key).collect(Collectors.toSet());
+//        Set<String> collect = allnodes.stream().filter(a -> a.hasV).map(a -> a.key).collect(Collectors.toSet());
         return null;
 //        return collect;
     }
@@ -233,7 +233,7 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
     @NotNull
     @Override
     public Collection<Object> values() {
-//        Set<Object> collect = nodes.stream().filter(a -> a.hasV).map(a -> a.values).collect(Collectors.toSet());
+//        Set<Object> collect = allnodes.stream().filter(a -> a.hasV).map(a -> a.values).collect(Collectors.toSet());
         return null;
 //        return collect;
     }
@@ -241,7 +241,7 @@ public class DHtree implements Map<String, Object>, KryoSerializable, Comparable
     @NotNull
     @Override
     public Set<Entry<String, Object>> entrySet() {
-//        Set collect = nodes.stream().filter(a -> a.hasV).map(a -> {
+//        Set collect = allnodes.stream().filter(a -> a.hasV).map(a -> {
 //            return new Entry() {
 //                @Override
 //                public Object getKey() {

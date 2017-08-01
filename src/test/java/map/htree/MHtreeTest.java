@@ -10,6 +10,7 @@
 
 package map.htree;
 
+import map.htreemap.HTreeMap;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,11 +21,11 @@ import static org.junit.Assert.assertEquals;
  */
 @SuppressWarnings("Duplicates")
 public class MHtreeTest {
-    MHtree mHtree = new MHtree();
+    HTreeMap mHtree = new HTreeMap();
 
     @Before
     public void setUp() throws Exception {
-        mHtree = new MHtree();
+        mHtree = new HTreeMap();
     }
 
     @Test
@@ -106,7 +107,7 @@ public class MHtreeTest {
 
     @Test
     public void test3() {
-        MHtree htree = new MHtree();
+        HTreeMap htree = new HTreeMap();
         htree.put("AaAa", "111");
         htree.put("BBBB", "222");
         htree.put("AaBB", "333");
@@ -123,7 +124,7 @@ public class MHtreeTest {
     public void test1() {
 
         int sum = 10000;
-        MHtree htree = new MHtree();
+        HTreeMap htree = new HTreeMap();
         for (int i = 0; i < sum; i++) {
             htree.put(i + "asd", i + "");
         }

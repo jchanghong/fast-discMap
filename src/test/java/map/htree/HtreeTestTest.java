@@ -10,6 +10,7 @@
 
 package map.htree;
 
+import map.htreemap.HTreeMap;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +23,7 @@ public class HtreeTestTest {
 
     @Test
     public void test3() {
-        MHtree htree = new MHtree();
+        HTreeMap htree = new HTreeMap();
         htree.put("AaAa", "111");
         htree.put("BBBB", "222");
         htree.put("AaBB", "333");
@@ -39,7 +40,7 @@ public class HtreeTestTest {
     public void test1() {
 
         int sum = 10000;
-        MHtree htree = new MHtree();
+        HTreeMap htree = new HTreeMap();
         for (int i = 0; i < sum; i++) {
             htree.put(i + "asd", i + "");
         }

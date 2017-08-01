@@ -10,7 +10,7 @@
 
 package map.demo;
 
-import map.htree.MHtree;
+import map.htreemap.HTreeMap;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +23,7 @@ public class compareMap {
     /**
      * The My.
      */
-    static Map<String, Object> my = new MHtree();
+    static Map<String, Object> my = new HTreeMap();
     /**
      * The Map.
      */

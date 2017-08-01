@@ -10,13 +10,16 @@
 
 package map.htree;
 
+import map.htreemap.HTreeMap;
+import map.htreemap.HtreeNode;
+
 /**
  * Created by jiang on 2016/12/19 0019.
  */
 @SuppressWarnings("DefaultFileTemplate")
 public class Compare2 {
     public static void main(String[] args) {
-        MHtree my = new MHtree();
+        HTreeMap my = new HTreeMap();
         int sum = 10000;
         for (int i = 0; i < sum; i++) {
             my.put(i + "asdf", i + "");
@@ -27,12 +30,12 @@ public class Compare2 {
 
 
         l = System.nanoTime();
-        for (int i = 0; i < sum; i++) {
-            HtreeNode node = MHtree.nodes.get(i);
-            if (node.hasV && node.key.equals("5000asdf")) {
-                break;
-            }
-        }
+//        for (int i = 0; i < sum; i++) {
+//            HtreeNode node = HTreeMap.allnodes.get(i);
+//            if (node.hasV && node.key.equals("5000asdf")) {
+//                break;
+//            }
+//        }
 
         System.out.println(System.nanoTime() - l);
 

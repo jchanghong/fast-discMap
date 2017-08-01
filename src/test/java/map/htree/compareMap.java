@@ -10,6 +10,7 @@
 
 package map.htree;
 
+import map.htreemap.HTreeMap;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 测试不同集合的查找速度
  */
 public class compareMap {
-    static Map<String, Object> my = new MHtree();
+    static Map<String, Object> my = new HTreeMap();
     static Map<String, Object> map = new HashMap<>();
     static Map<String, Object> maptree = new TreeMap<>();
     static Map<String, Object> mapconcur = new ConcurrentHashMap<>();
