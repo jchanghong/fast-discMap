@@ -10,6 +10,9 @@
 
 package map.htree;
 
+import map.util.Primenumber;
+
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -17,11 +20,14 @@ import java.util.List;
 /**
  * Created by jiang on 2016/12/19 0019.
  */
-public class MHashCodes {
+public class HashCodes {
     /**
      * The constant codes.
      */
-    public static int[] codes = new int[]{997, 991, 983, 977, 971, 967, 953, 947, 941, 937};
+    public static int[] codes;
+    static {
+       codes= Primenumber.getPrimes(1000).stream().filter(a -> a > 10 && a < 100).mapToInt(Integer::intValue).toArray();
+    }
 
     /**
      * The entry point of application.
@@ -29,22 +35,16 @@ public class MHashCodes {
      * @param args the input arguments
      */
     public static void main(String[] args) {
-        int sum = 1000;
-        List<Integer> integers = new ArrayList<>();
-        boolean isgood;
-        for (int i = 0; i < sum; i++) {
-            isgood = true;
-            for (int j = 2; j <= i / 2; j++) {
-                if (i % j == 0) {
-                    isgood = false;
-                    break;
-                }
-            }
-            if (isgood) {
-                integers.add(i);
-            }
+
+        BigInteger integer = BigInteger.ONE;
+        for (int a :
+                codes) {
+            System.out.println(a);
+            integer = integer.multiply(BigInteger.valueOf(a));
         }
-        integers.sort(Comparator.reverseOrder());
-        integers.stream().limit(10).forEach(System.out::println);
+        System.out.println(integer.toString());
+        System.out.println(Integer.MAX_VALUE);
+        System.out.println(Long.MAX_VALUE);
+
     }
 }

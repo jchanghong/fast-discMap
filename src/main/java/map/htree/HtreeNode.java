@@ -20,7 +20,7 @@ import java.io.ObjectOutput;
 /**
  * Created by jiang on 2016/12/19 0019.
  */
-public class MHtreeNode implements Comparable<MHtreeNode>, Externalizable {
+public class HtreeNode implements Comparable<HtreeNode>, Externalizable {
 
     /**
      * The High.
@@ -33,7 +33,7 @@ public class MHtreeNode implements Comparable<MHtreeNode>, Externalizable {
     /**
      * The Childs.
      */
-    public MHtreeNode[] childs;
+    public HtreeNode[] childs;
     /**
      * The Has v.
      */
@@ -50,7 +50,7 @@ public class MHtreeNode implements Comparable<MHtreeNode>, Externalizable {
     /**
      * Instantiates a new M htree node.
      */
-    public MHtreeNode() {
+    public HtreeNode() {
     }
 
     /**
@@ -60,9 +60,9 @@ public class MHtreeNode implements Comparable<MHtreeNode>, Externalizable {
      * @param key    the key
      * @param values the values
      */
-    public MHtreeNode(int high, String key, Object values) {
+    public HtreeNode(int high, String key, Object values) {
         this.high = high;
-        code = MHashCodes.codes[high];
+        code = HashCodes.codes[high];
         this.key = key;
         this.values = values;
         hasV = !(key == null || high == 0);
@@ -81,8 +81,8 @@ public class MHtreeNode implements Comparable<MHtreeNode>, Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 
         this.high = in.read();
-        this.code = MHashCodes.codes[high];
-        childs = (MHtreeNode[]) in.readObject();
+        this.code = HashCodes.codes[high];
+        childs = (HtreeNode[]) in.readObject();
         hasV = in.readBoolean();
         try {
             key = (String) in.readObject();
@@ -105,13 +105,13 @@ public class MHtreeNode implements Comparable<MHtreeNode>, Externalizable {
     public Object putchild(String key, Object values, int hashcode) {
         int mycode = hashcode % code;
         if (childs == null) {
-            childs = new MHtreeNode[code];
-            childs[mycode] = new MHtreeNode(high + 1, key, values);
+            childs = new HtreeNode[code];
+            childs[mycode] = new HtreeNode(high + 1, key, values);
             MHtree.nodes.add(childs[mycode]);
             return values;
         }
         if (childs[mycode] == null) {
-            childs[mycode] = new MHtreeNode(high + 1, key, values);
+            childs[mycode] = new HtreeNode(high + 1, key, values);
             MHtree.nodes.add(childs[mycode]);
             return values;
         }
@@ -175,7 +175,7 @@ public class MHtreeNode implements Comparable<MHtreeNode>, Externalizable {
     }
 
     @Override
-    public int compareTo(@NotNull MHtreeNode o) {
+    public int compareTo(@NotNull HtreeNode o) {
         if (key == null) {
             return o == null ? 0 : o.compareTo(this);
         }

@@ -15,7 +15,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoSerializable;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import map.htree.MHashCodes;
+import map.htree.HashCodes;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -72,7 +72,7 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
      */
     public DHtreeNode(int high, String key, Object values) {
         this.high = high;
-        code = MHashCodes.codes[high];
+        code = HashCodes.codes[high];
         this.key = key;
         this.values = values;
         hasV = !(key == null || high == 0);
@@ -129,7 +129,7 @@ public class DHtreeNode implements Comparable<DHtreeNode>, KryoSerializable {
     public void read(Kryo kryo, Input in) {
         this.high = in.read();
         childs = kryo.readObjectOrNull(in, int[].class);
-        this.code = MHashCodes.codes[high];
+        this.code = HashCodes.codes[high];
         hasV = in.readBoolean();
         key = kryo.readObjectOrNull(in, String.class);
         values = kryo.readClassAndObject(in);

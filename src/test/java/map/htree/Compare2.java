@@ -28,7 +28,7 @@ public class Compare2 {
 
         l = System.nanoTime();
         for (int i = 0; i < sum; i++) {
-            MHtreeNode node = MHtree.nodes.get(i);
+            HtreeNode node = MHtree.nodes.get(i);
             if (node.hasV && node.key.equals("5000asdf")) {
                 break;
             }

@@ -24,17 +24,17 @@ public class MHtree implements Map<String, Object>, Serializable {
     /**
      * The constant nodes.
      */
-    public static List<MHtreeNode> nodes = new ArrayList<>(1000);
-    private MHtreeNode root;
+    public static List<HtreeNode> nodes = new ArrayList<>(1000);
+    private HtreeNode root;
 
     /**
      * Instantiates a new M htree.
      */
     public MHtree() {
-        root = new MHtreeNode(0, null, null);
+        root = new HtreeNode(0, null, null);
         nodes.clear();
         nodes.add(root);
-        root.childs = new MHtreeNode[root.code];
+        root.childs = new HtreeNode[root.code];
     }
 
     @Override
@@ -64,7 +64,7 @@ public class MHtree implements Map<String, Object>, Serializable {
         }
         int hashcode = Math.abs(key.hashCode());
         int code0 = hashcode % root.code;
-        MHtreeNode node = root.childs[code0];
+        HtreeNode node = root.childs[code0];
         if (node == null) {
             return null;
         } else {
@@ -82,9 +82,9 @@ public class MHtree implements Map<String, Object>, Serializable {
         }
         int hashcode = Math.abs(key.hashCode());
         int code0 = hashcode % root.code;
-        MHtreeNode node = root.childs[code0];
+        HtreeNode node = root.childs[code0];
         if (node == null) {
-            root.childs[code0] = new MHtreeNode(1, key, value);
+            root.childs[code0] = new HtreeNode(1, key, value);
             MHtree.nodes.add(root.childs[code0]);
             return null;
         } else {
@@ -111,7 +111,7 @@ public class MHtree implements Map<String, Object>, Serializable {
         }
         int hashcode = Math.abs(key.hashCode());
         int code0 = hashcode % root.code;
-        MHtreeNode node = root.childs[code0];
+        HtreeNode node = root.childs[code0];
         if (node == null) {
             return null;
         } else {
@@ -133,7 +133,7 @@ public class MHtree implements Map<String, Object>, Serializable {
 
     @Override
     public void clear() {
-        for (MHtreeNode node : nodes) {
+        for (HtreeNode node : nodes) {
             node.hasV = false;
         }
     }
