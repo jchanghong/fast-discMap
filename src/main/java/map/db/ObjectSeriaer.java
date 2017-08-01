@@ -26,7 +26,7 @@ public class ObjectSeriaer {
      * The constant kryo.
      */
 //KryoException
-    public static Kryo kryo = new Kryo();
+    public static final Kryo kryo = new Kryo();
     /**
      * The Minput.
      */
@@ -49,11 +49,9 @@ public class ObjectSeriaer {
         try {
             kryo.writeClassAndObject(moutput, o);
         } catch (KryoException e) {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream(mbuff.length * 2);
-            Output out2 = new Output(outputStream);
-            kryo.writeClassAndObject(out2, o);
-            out2.flush();
-            return outputStream.toByteArray();
+            mbuff = new byte[mbuff.length * 2];
+            moutput = new Output(mbuff);
+          return   getbytes(o);
         }
         return moutput.toBytes();
     }
