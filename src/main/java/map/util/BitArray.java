@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by jiang on 2016/12/20 0020.
  * 位置从0开始-size-1,直接操作文件头
+ * 位图管理空间
  * true falues 代表1,0
  */
 public class BitArray {
